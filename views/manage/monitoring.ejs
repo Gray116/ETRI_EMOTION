@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/bootstrap-5.1.3-dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/stylesheets/styles.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
+    <link href="/stylesheets/monitoring.css"rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="/stylesheets/jquery-ui-themes-1.13.2/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+    <link href="#"rel="shortcut icon" />
+    <title><%= title %></title>
+</head>
+<body>
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark shadow">
+        <!-- Navbar Brand-->
+        <a class= "navbar-brand logo" href= "/manage"><img src= "/images/neighbor_white.png" alt= "네이버시스템" width="220px;"/></a>
+        
+        <!-- Sidebar Toggle-->
+        <button class= "btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id= "sidebarToggle" href= "#!"><i class= "fas fa-bars"></i></button>
+        
+        <!-- Navbar Search-->
+        <form class= "d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+            <div class= "input-group">
+                <!-- <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+                <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button> -->
+            </div>
+        </form>
+        
+        <!-- Navbar-->
+        <ul class= "navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class= "nav-item dropdown">
+                <a class= "nav-link dropdown-toggle" id= "navbarDropdown" href= "#" role= "button" data-bs-toggle= "dropdown" aria-expanded= "false"><i class= "fas fa-user fa-fw"></i></a>
+                <ul class= "dropdown-menu dropdown-menu-end" aria-labelledby= "navbarDropdown">
+                    <li style= "text-align: center; padding-bottom: 0.5em;">
+                        <a href= "#" class= "change_info">개인정보 수정</a>
+                    </li>
+                    <li>
+                        <form action= "/process/logout" method= "get">
+                            <button class= "manage_signout" type= "submit" style= "border: none; outline:0;">로그아웃</button>
+                        </form>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+                        <a class="nav-link" href="/manage">전체 감성현황</a>
+                        <a class="nav-link" href="/manage/statistics">감성상태 통계분석</a>
+                        <a class="nav-link" href="/manage/230811_dashboard">감성현황 대시보드</a>
+                        <a class="nav-link" href="/manage/monitoring">상담사 통화이력</a>
+                        <a class="nav-link" href="/manage/counseling">상담사 코칭</a>
+                    </div>
+                </div>
+
+                <div class= "sb-sidenav-footer">
+                    <div class="small" style="text-align: center;">Logged in as: Admin</div>
+                </div>
+            </nav>
+        </div>
+        
+        <div id="layoutSidenav_content">
+            <main class="col-md-9 ms-sm-auto col-lg-12 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h2 style="font-weight: bold;">상담사 통화이력</h2>
+                </div>
+                
+                <div class="container-fluid">
+                    <!-- 상담원 감성상태 및 통화 이력 -->
+                    <div class="list">
+                        <div class="emotional_state" style="margin-top: 1.5%;">                                                 
+                            <div class="container-fluid mt-4">
+                                <h5>상담사 감성상태</h5>
+
+                                <!-- 감성상태 그래프 -->
+                                <div class="container-fluid mt-3">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="input-group" style="width: 25%; float:left; margin-right: 1%; margin-left:-1%;">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="inputGroup-sizing-sm" style="border-radius: 0;">이름</span>
+                                                </div>
+                                                <select class="form-select" aria-label="Default select example" name="emo_stat_user_select">
+                                                    <option selected>선택</option>
+                                                    <option value="1">seolwoong</option>
+                                                    <option value="2">minji</option>
+                                                    <option value="3">jaehoon</option>
+                                                </select>
+                                            </div>
+        
+                                            <div class="input-group" style="width: 28%; float:left; margin-right: 1%;">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="inputGroup-sizing-sm" style="border-radius: 0;">날짜</span>
+                                                </div>
+                                                <input type="date" id="myDate" class="form-control" name="select_date">
+                                            </div>
+            
+                                            <div class="input-group" style="width:36%; float:left; margin-right: 1%;">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="inputGroup-sizing-sm" style="border-radius:0">시간</span>
+                                                </div>
+                                                <input type="text" id="myTime" class="form-control" name="select_time">
+        
+                                                <button class="btn btn-primary" id="emo_send">조회</button>
+                                            </div>
+
+                                            <button class="btn btn-info" id="emo_upt" disabled>갱신</button>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <div class="input-group" style="width:55%; float:left; margin-right: 3%;">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="inputGroup-sizing-sm">감정상태</span>
+                                                </div>
+                                                
+                                                <div class="form-control row" style="padding:0%;">
+                                                    <div style="margin-top: 2%;">
+                                                        <div class="col-sm-3" 
+                                                            style="width:20%; float:left; text-align:center; 
+                                                            background-color:red; font-size:1em;">화남</div>
+                                                        <div class="col-sm-3" 
+                                                            style="width:20%; float:left; text-align:center; 
+                                                            background-color:blue; color:#f1f1f1; font-size:1em;">슬픔</div>
+                                                        <div class="col-sm-3" 
+                                                            style="width:20%; float:left; text-align:center; background-color: gray; font-size:1em;">중립</div>
+                                                        <div class="col-sm-3" 
+                                                            style="width:20%; float:left; text-align:center; background-color:green; font-size:1em;">평온</div>
+                                                        <div class="col-sm-3" 
+                                                            style="width:20%; float:left; text-align:center; background-color:#F1AF14; font-size:1em;">행복</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="input-group" style="width:40%; float:left;">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="inputGroup-sizing-sm">통화상태</span>
+                                                </div>
+                                                <div class="form-control row">
+                                                    <div>
+                                                        <div class="col-sm-6" 
+                                                            style="width:50%; float:left; text-align:center; background-color: purple; font-size:1em;
+                                                                color:#f1f1f1;">통화중</div>
+                                                        <div class="col-sm-6" 
+                                                            style="width:50%; float: left; text-align:center; font-size:1em;">대기중</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="set_div">
+                                    <div class="container-fluid emo_div" style="display: none;">
+                                        <h5 class="emo_stat_name" style="margin-top: 1%; font-weight:bold;">김설웅</h5>
+                                        <div class="statusWrap">
+                                            <div class="left">
+                                                <p>감정상태</p>
+                                                <p>통화상태</p>
+                                                <p>시간(분)</p>
+                                            </div>
+                                            
+                                            <div class="right">
+                                                <ul class="emo_stat scroll">
+                                                    <li class="emo_list_first">
+                                                        <div id="emo_type" class="emo_type typeBox"></div>
+                                                    </li>
+                                                    <li class="emo_list_second">
+                                                        <div id="call_stat" class="call_stat typeBox"></div>
+                                                    </li>
+                                                    <li class="emo_list_third">
+                                                        <div id="emo_time" class="emo_time typeBox"></div>
+                                                    </li>
+                                                </ul>  
+                                            </div>
+                                        </div>    
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 페이징 처리 -->
+                            <ul class="pagination" id="pages"></ul>
+                        </div>
+
+                        <!-- 상담사 상담 이력 테이블 -->
+                        <div class="counseling_list container-fluid">
+                            <h5>상담사 상담 이력</h5>
+                            <div class="container-fluid">
+                                <table class="table table-hover table-borderless">
+                                    <thead class="table" style="background-color: #212529; color:#f1f1f1;">
+                                        <tr>
+                                            <th scope="col" style="width: 11%;">번호</th>
+                                            <th scope="col" style="width: 15%;">상담사</th>
+                                            <th scope="col" style="width: 16%;">그룹</th>
+                                            <th scope="col" style="width: 20%;">통화시작 시간</th>
+                                            <th scope="col" style="width: 20%;">통화종료 시간</th>
+                                            <th scope="col" style="width: 18%;">총 통화 시간</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (call_table.length == 0) { %> 
+                                            <tr><td colspan="9">표시할 데이터가 없습니다</td></tr>
+                                        <% } else { %>
+                                            <% for(var i=0; i < call_table.length; i++) { 
+                                                let data2 = call_table[i]; %>
+                                        
+                                                <tr>
+                                                    <!-- 시퀀스 -->
+                                                    <th scope="row"><%= i+1 %></th>
+        
+                                                    <!-- 상담사 이름 -->
+                                                    <% let data_name = agent_name[data2.agent_id-1]['agent_name']; %>
+                                                    <td><%= data_name %></td>
+        
+                                                    <!-- 문의 유형 -->
+                                                    <% 
+                                                        if(data2.group_type == '1') {%>
+                                                            <td>일반문의</td>
+                                                        <%} else if(data2.group_type == '2') {%>
+                                                            <td>민원접수</td>
+                                                        <%} else if(data2.group_type == '3') {%>
+                                                            <td>제품판매</td>
+                                                        <%} else if(data2.group_type == '4') {%>
+                                                            <td>기타문의</td>
+                                                        <%} else {%>
+                                                            <td>데이터 없음</td>
+                                                        <%}
+                                                    %>
+        
+                                                    <!-- 통화 시작 시간, 종료 시간, 총 통화 시간 -->
+                                                    <td><%= moment(data2.connect_dt).format('YYYY-MM-DD HH:mm:ss'); %></td>
+
+                                                    
+                                                    <!-- 통화 중인 경우 -->
+                                                    <%
+                                                        if(data2.disconnect_dt == null || data2.disconnect_dt == '') {%>
+                                                            <td>데이터 없음</td>
+                                                        <%} else {%>
+                                                            <td><%= moment(data2.disconnect_dt).format('YYYY-MM-DD HH:mm:ss'); %></td>
+                                                        <%}
+                                                    %>
+
+                                                    <!-- 통화 중인 경우 -->
+                                                    <%
+                                                        if(data2.call_time == null || data2.call_time == '') {%>
+                                                            <td>데이터 없음</td>
+                                                        <%} else {%>
+                                                            <td><%= data2.call_time %></td>
+                                                        <%}
+                                                    %>
+                                                </tr>
+                                            <% } %>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- 페이징 처리 -->
+                            <ul class="pagination2"></ul>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- JQUERY & JQUERY UI -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    
+    <!-- 부트스트랩 & TIMEPICKER -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="../bootstrap-5.1.3-dist/js/scripts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+    
+    <!-- 차트 및 폰트 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+
+    <!-- 페이징, 폼 전송 -->
+    <script type="text/javascript">
+        // datepicker 오늘 날짜까지만
+        $(document).ready(function() {
+            let now_utc = Date.now();
+            let timeOff = new Date().getTimezoneOffset() * 60000; // 분단위를 밀리초로 변환
+            let today = new Date(now_utc - timeOff).toISOString().split("T")[0];
+
+            document.getElementById("myDate").setAttribute("max", today);
+            document.getElementById("myDate").setAttribute("value", today);
+
+            let now = new Date();
+            let hours = now.getHours();
+            let mins = now.getMinutes();
+    
+            let amPm;
+            if(hours >= 12) {
+                amPm = 'pm'
+            } else {
+                amPm = 'am'
+            }
+    
+            // timepicker 설정
+            $("#myTime").timepicker({
+                timeFormat: 'p HH:mm', // 시:분 오전,오후
+                interval: 10,
+                minTime: 'am 00:00',
+                maxHour: '24',
+                dynamic: false,
+                dropdown: true,
+                scrollbar: true,
+                defaultTime: `${amPm} ${hours}:${mins}`
+            });
+        });
+
+        // 페이징
+        function pagination() {
+            let req_num_row = 10;
+            let $tr = jQuery('.emotional_state tbody tr');
+            let total_num_row = $tr.length;
+            let num_pages = 0;
+            
+            if(total_num_row % req_num_row == 0) {
+                num_pages=total_num_row / req_num_row;
+            }
+            if(total_num_row % req_num_row >= 1) {
+                num_pages=total_num_row / req_num_row;
+                num_pages++;
+                num_pages=Math.floor(num_pages++);
+            }
+
+            for(let i=1; i<=num_pages; i++){
+                jQuery('.pagination').append("<li><a>"+i+"</a></li>");
+                jQuery('.pagination li:nth-child(2)').addClass("active");
+                jQuery('.pagination a').addClass("pagination-link");
+            }
+            
+            $tr.each(function(i) {
+                jQuery(this).hide();
+                if(i+1 <= req_num_row) {
+                    $tr.eq(i).show();
+                }
+            });
+            
+            jQuery('.pagination a').click('.pagination-link', function(e) {
+                e.preventDefault();
+                $tr.hide();
+                let page=jQuery(this).text();
+                let temp=page-1;
+                let start=temp*req_num_row;
+                let current_link = temp;
+                
+                jQuery('.pagination li').removeClass("active");
+                jQuery(this).parent().addClass("active");
+            
+                for(let i=0; i< req_num_row; i++){
+                    $tr.eq(start+i).show();
+                }
+                
+                if(temp >= 1){
+                    jQuery('.pagination li:first-child').removeClass("disabled");
+                } else {
+                    jQuery('.pagination li:first-child').addClass("disabled");
+                }
+            });
+        }    
+        function pagination2() {
+            let req_num_row     = 5;
+            let $tr             = jQuery('.counseling_list tbody tr');
+            let total_num_row   = $tr.length;
+            let num_pages       = 0;
+        
+            if(total_num_row % req_num_row == 0) {
+                num_pages = total_num_row / req_num_row;
+            }
+            if(total_num_row % req_num_row >= 1) {
+                num_pages = total_num_row / req_num_row;
+                num_pages++;
+                num_pages = Math.floor(num_pages++);
+            }
+           
+            
+            for(let i=1; i<=num_pages; i++){
+                jQuery('.pagination2').append("<li><a>"+i+"</a></li>");
+                jQuery('.pagination2 li:nth-child(2)').addClass("active");
+                jQuery('.pagination2 a').addClass("pagination-link");
+            }
+            
+            $tr.each(function(i) {
+                jQuery(this).hide();
+                if(i+1 <= req_num_row) {
+                    $tr.eq(i).show();
+                }
+            });
+            
+            jQuery('.pagination2 a').click('.pagination-link', function(e) {
+                e.preventDefault();
+                $tr.hide();
+                let page=jQuery(this).text();
+                let temp=page-1;
+                let start=temp*req_num_row;
+                let current_link = temp;
+                
+                jQuery('.pagination2 li').removeClass("active");
+                jQuery(this).parent().addClass("active");
+            
+                for(let i=0; i< req_num_row; i++){
+                    $tr.eq(start+i).show();
+                }
+                
+                if(temp >= 1){
+                    jQuery('.pagination2 li:first-child').removeClass("disabled");
+                } else {
+                    jQuery('.pagination2 li:first-child').addClass("disabled");
+                }
+            });
+        }
+    
+        jQuery('document').ready(function(){
+            pagination();
+            jQuery('.pagination li:first-child').addClass("disabled");
+            pagination2();
+            jQuery('.pagination2 li:first-child').addClass("disabled");
+        });
+    </script>
+
+    <!-- 상담사 통화 중 감정 상태 -->
+    <script type="text/javascript">
+        let autoAjax;
+
+        // 년(4)월(2)일(2)시분초 구하기
+        function dateFormat() {
+            let date = new Date();
+
+            let yyyy = date.getFullYear();
+            let mm = date.getMonth() + 1;
+            mm = mm >= 10 ? mm : '0'+mm;
+            let dd = date.getDate();
+            dd = dd >= 10 ? dd : '0'+dd;
+            let hh = date.getHours();
+            hh = hh >= 10 ? hh : '0'+hh;
+            let mins = date.getMinutes();
+            mins = mins >= 10 ? mins : '0'+mins;
+            let seconds = date.getSeconds();
+            seconds = seconds >= 10 ? seconds : '0'+seconds;
+
+            return yyyy.toString() + mm.toString() + dd.toString() + hh.toString() + mins.toString() + seconds.toString();
+        }
+
+        function ajaxCall(emo_graph_data, emo_call_data, autoDate) {
+            console.log('CALL AJAX');
+
+            $.ajax({
+                url: `/manage/monitoring_emo?autoDate=${autoDate}`,
+                type: 'GET',
+                dataType: 'JSON',
+                contentType: 'application/json',
+                async: false,
+                success: function(data) {
+                    $('.emo_div').show();
+                    $('.emo_type').empty();
+                    $('.call_stat').empty();
+                    $('.emo_type').empty();
+
+                    for(let i=0; i<data.length; i++) {
+                        emo_graph_data.push(data[i].emotion_type);
+                        emo_call_data.push(data[i].agent_status);
+                    }
+
+                    for(let i=0; i<emo_graph_data.length; i++) {
+                        if(emo_graph_data[i] == 5) {
+                            $("#emo_type").append(`<p style="background-color: #F1AF14; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        } else if(emo_graph_data[i] == 10) {
+                            $("#emo_type").append(`<p style="background-color: green; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        } else if(emo_graph_data[i] == 14) {
+                            $("#emo_type").append(`<p style="background-color: gray; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        } else if(emo_graph_data[i] == 6) {
+                            $("#emo_type").append(`<p style="background-color: blue; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        } else if(emo_graph_data[i] == 7) {
+                            $("#emo_type").append(`<p style="background-color: red; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        } else {
+                            $("#emo_type").append(`<p style="background-color: #fff; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        }
+                    }
+
+                    for(let i=0; i<emo_call_data.length; i++) {
+                        if(emo_call_data[i] == 0) {
+                            $("#call_stat").append(`<p style="background-color: #fff; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        } else {
+                            $("#call_stat").append(`<p style="background-color: purple; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        }
+                    }
+
+                    for(let i=0; i<47; i++) {
+                        if(i == 23) {
+                            $("#emo_time").append(`<p style="width:30px; height:30px; text-align:center; padding-bottom: -32px; white-space: nowrap;">5분</p>`);
+                        }
+
+                        if(i == 46) {
+                            $("#emo_time").append(`<p style="width:30px; height:30px; text-align:center; padding-bottom: -32px; white-space: nowrap;">10분</p>`);
+                        }
+
+                        else {
+                            $("#emo_time").append(`<p style="color:#fff !important; width:30px; height:30px; text-align:center; margin-bottom: -32px; white-space: nowrap;"></p>`);
+                        }
+                    }
+                },
+                error: function(err) {
+                    alert('데이터 수신 오류');
+                    alert(JSON.stringify(err));
+                }
+            });
+        }
+
+        // 단발성 조회 버튼(조회)
+        $('#emo_send').click(function() {
+            // 재조회 시 div append 방지
+            $('#emo_type').empty();
+            $('#call_stat').empty();
+            $('#emo_time').empty();
+
+            $('#emo_upt').attr('disabled', false);
+
+            let emo_graph_data  = new Array();
+            let emo_call_data   = new Array();
+
+            let myDate          = document.getElementById('myDate').value;
+            let myTime          = document.getElementById('myTime').value;
+            
+            $.ajax({
+                url: '/manage/monitoring_emo?select_date='+myDate+'&select_time='+myTime,
+                type: 'GET',
+                dataType: 'JSON',
+                contentType: 'application/json',
+                async: false,
+                success: function(data) {
+                    $('.emo_div').show();
+
+                    for(let i=0; i<data.length; i++) {
+                        emo_graph_data.push(data[i].emotion_type);
+                        emo_call_data.push(data[i].agent_status);
+                    }
+
+                    for(let i=0; i<emo_graph_data.length; i++) {
+                        if(emo_graph_data[i] == 5) {
+                            $("#emo_type").append(`<p style="background-color: #F1AF14; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        } else if(emo_graph_data[i] == 10) {
+                            $("#emo_type").append(`<p style="background-color: green; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        } else if(emo_graph_data[i] == 14) {
+                            $("#emo_type").append(`<p style="background-color: gray; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        } else if(emo_graph_data[i] == 6) {
+                            $("#emo_type").append(`<p style="background-color: blue; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        } else if(emo_graph_data[i] == 7) {
+                            $("#emo_type").append(`<p style="background-color: red; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        } else {
+                            $("#emo_type").append(`<p style="background-color: #fff; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        }
+                    }
+
+                    for(let i=0; i<emo_call_data.length; i++) {
+                        if(emo_call_data[i] == 0) {
+                            $("#call_stat").append(`<p style="background-color: #fff; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        } else {
+                            $("#call_stat").append(`<p style="background-color: purple; width:7px; height:30px; white-space: nowrap;"></p>`);
+                        }
+                    }
+
+                    for(let i=0; i<47; i++) {
+                        if(i == 23) {
+                            $("#emo_time").append(`<p style="width:30px; height:30px; text-align:center; padding-bottom: -32px; white-space: nowrap;">5분 전</p>`);
+                        }
+
+                        if(i == 46) {
+                            $("#emo_time").append(`<p style="width:30px; height:30px; text-align:center; padding-bottom: -32px; white-space: nowrap;">조회시간</p>`);
+                        }
+                       
+                        else {
+                            $("#emo_time").append(`<p style="color:#fff !important; width:30px; height:30px; text-align:center; margin-bottom: -32px; white-space: nowrap;"></p>`);
+                        }
+                    }
+                },
+                error: function(err) {
+                    alert('데이터 수신 오류');
+                    alert(JSON.stringify(err));
+                }
+            });
+        });
+
+        // 2초마다 데이터 갱신
+        $('#emo_upt').click(function() {
+            if($('#emo_upt').text() == '중지') {
+                $('#emo_send').attr('disabled', false);
+
+                $('#emo_upt').text('갱신');
+                $('#emo_upt').removeClass('btn-danger');
+                $('#emo_upt').addClass('btn-info');
+                
+                $('#emo_upt').attr('disabled', true);
+
+                clearInterval(autoAjax);
+            } else {
+                let emo_graph_data  = new Array();
+                let emo_call_data   = new Array();
+
+                let autoDate = dateFormat();
+
+                /*$('#emo_type').empty();
+                $('#call_stat').empty();
+                $('#emo_time').empty();*/
+                
+                $('#emo_send').attr('disabled', true);
+            
+                $('#emo_upt').text('중지');
+                $('#emo_upt').removeClass('btn-info');
+                $('#emo_upt').addClass('btn-danger');
+
+                // 처음 갱신 시 한번 호출
+                ajaxCall(emo_graph_data, emo_call_data, autoDate);
+                autoAjax = setInterval(function() {
+                    emo_graph_data  = new Array();
+                    emo_call_data   = new Array();
+
+                    // 재조회 시 append 방지를 위해서 div내의 컨텐츠 초기화
+                    $('#emo_type').empty();
+                    $('#call_stat').empty();
+                    $('#emo_time').empty();
+
+                    $.ajax({
+                        url: `/manage/monitoring_emo?autoDate=${autoDate}`,
+                        type: 'GET',
+                        dataType: 'JSON',
+                        contentType: 'application/json',
+                        async: false,
+                        success: function(data) {
+                            $('.emo_div').show();
+        
+                            for(let i=0; i<data.length; i++) {
+                                emo_graph_data.push(data[i].emotion_type);
+                                emo_call_data.push(data[i].agent_status);
+                            }
+        
+                            for(let i=0; i<emo_graph_data.length; i++) {
+                                if(emo_graph_data[i] == 5) {
+                                    $("#emo_type").append(`<p style="background-color: #F1AF14; width:7px; height:30px; white-space: nowrap;"></p>`);
+                                } else if(emo_graph_data[i] == 10) {
+                                    $("#emo_type").append(`<p style="background-color: green; width:7px; height:30px; white-space: nowrap;"></p>`);
+                                } else if(emo_graph_data[i] == 14) {
+                                    $("#emo_type").append(`<p style="background-color: gray; width:7px; height:30px; white-space: nowrap;"></p>`);
+                                } else if(emo_graph_data[i] == 6) {
+                                    $("#emo_type").append(`<p style="background-color: blue; width:7px; height:30px; white-space: nowrap;"></p>`);
+                                } else if(emo_graph_data[i] == 7) {
+                                    $("#emo_type").append(`<p style="background-color: red; width:7px; height:30px; white-space: nowrap;"></p>`);
+                                } else {
+                                    $("#emo_type").append(`<p style="background-color: #fff; width:7px; height:30px; white-space: nowrap;"></p>`);
+                                }
+                            }
+        
+                            for(let i=0; i<emo_call_data.length; i++) {
+                                if(emo_call_data[i] == 0) {
+                                    $("#call_stat").append(`<p style="background-color: #fff; width:7px; height:30px; white-space: nowrap;"></p>`);
+                                } else {
+                                    $("#call_stat").append(`<p style="background-color: purple; width:7px; height:30px; white-space: nowrap;"></p>`);
+                                }
+                            }
+        
+                            for(let i=0; i<47; i++) {
+                                if(i == 23) {
+                                    $("#emo_time").append(`<p style="width:30px; height:30px; 
+                                                            text-align:center; padding-bottom: -32px; 
+                                                            white-space: nowrap;">5분 전</p>`);
+                                }
+        
+                                if(i == 46) {
+                                    $("#emo_time").append(`<p style="width:30px; height:30px;
+                                                            text-align:center; padding-bottom: -32px;
+                                                            white-space: nowrap;">현재시간</p>`);
+                                }
+                               
+                                else {
+                                    $("#emo_time").append(`<p style="color:#fff !important; width:30px;
+                                                            height:30px; text-align:center; margin-bottom: -32px; 
+                                                            white-space: nowrap;"></p>`);
+                                }
+                            }
+                        },
+                        error: function(err) {
+                            alert('데이터 수신 오류');
+                            alert(JSON.stringify(err));
+                        }
+                    });
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>

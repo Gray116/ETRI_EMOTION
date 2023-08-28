@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/bootstrap-5.1.3-dist/css/bootstrap.min.css"    rel="stylesheet"/>
+    <link href="/stylesheets/style.css"                         rel="stylesheet"/>
+    <link href="#"                                              rel="shortcut icon"/>
+    <title>NB 콜센터</title>
+</head>
+<body>
+    <div id = 'topNav'>
+        <div class="navbar-brand logo">
+            <a href="index.ejs"><img src="/images/neighbor_white.png" alt="" width="190"></a>
+        </div>
+
+        <div class="navbar_client">
+            <h2 class="inner_client"></h2>
+        </div>
+
+        <div class="navbar_form">
+            <form action = '/process/logout' method = "get">
+                <button class="btn btn-sm btn-primary submit signout" type="submit">로그아웃</button>
+            </form>
+        </div>
+    </div><!-- [e] topNav -->
+    
+    <!-- [s] wrap -->
+    <div class = "wrap">
+        <!-- 좌측 고객정보, 상담유형 -->
+        <div class= "left_client">
+            <h5 style="font-weight: bold;">상담정보</h5>
+            <form action= "/callCenter/clients_details" method= "get" id= "clientForm">
+                <div class= "details_3 form-group">
+                    <label for="exampleFormControlInput3">전화번호</label>
+                    <input id="client_phone" class="form-control" type="text" placeholder="번호 입력['-' 제외]" maxlength = "11" oninput= "this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"/>
+                </div>
+
+                <div class= "details_1 form-group">
+                    <label for="exampleFormControlInput1">고객명</label>
+                    <input id="client_name" class="form-control" type="text" placeholder= "이름 입력"/>
+                </div>
+
+                <div class="details_2 form-group">
+                    <label for="exampleFormControlSelect2">상담유형</label>
+                    <select id="exampleFormControlSelect2" class="mySelect form-control custom-select custom-select-sm">
+                        <option value="선택" selected="selected">선택</option>
+                        <option value="일반문의">일반문의</option>
+                        <option value="민원접수">민원접수</option>
+                        <option value="제품판매">제품판매</option>
+                        <option value="기타문의">기타문의</option>
+                    </select>
+                </div>
+                
+                <div class= "counsel_detail form-group">
+                    <label for="exampleFormControlInput3">상담내역</label>
+                    <textarea id="counsel_info" class="form-control" placeholder= "상담 내역을 입력해주세요" cols= "30" rows= "10"></textarea>
+                </div>
+            </form>
+
+            <div class="btn-group">
+                <input type= "button" class= "client_save btn btn-primary btn-sm"  value= "고객정보 저장" style="border-radius: 5%;"/>
+                <input type= 'button' class= 'startButton1 btn btn-success btn-sm' value= '전화 받기' style="width: 100%; border-radius: 5%;"/>
+                <input type= 'button' class= 'stopButton1 btn btn-sm'              value= '전화 끊기' style="width: 100%; border-radius: 5%;" disabled/>
+            </div>
+        </div>
+
+        <!-- 우측 srchBox -->
+        <div class="srchBox">
+            <div class="fromManager">
+                <p class= "emotion_status">
+                    <span class = "agent_emotion"></span>
+                </p>
+                <label for="exampleFormControlTextarea1">관리자 메세지</label>
+                <textarea class="form-control" name= "content" id= "EventMsg" cols= "100" rows= "8" wrap= "on" readonly></textarea>
+            </div>
+        </div><!-- [e] srchBox -->
+
+        <div class= "bottom_emotion_table">
+            <div class="counseling_list">
+                <div>
+                    <p class="text_left">상담사 통화 이력</p>
+                    <p class="button_right"><input type= "button" value= "통화이력 조회" class= "btn btn-primary btn-sm callHistoryButton"/></p>
+                </div>
+
+                <div id="resetTable">
+                    <table id= "myTable" class="table table-hover table-striped">
+                        <colgroup>
+                            <col span= "1" style= "width: 5%">
+                            <col span= "1" style= "width: 10%">
+                            <col span= "1" style= "width: 12%">
+                            <col span= "1" style= "width: 10%">
+                            <col span= "1" style= "width: 15%">
+                            <col span= "1" style= "width: 15%">
+                            <col span= "1" style= "width: 10%">
+                            <col span= "1" style= "width: 23%">
+                        </colgroup>
+                        <thead class="thead-light">
+                            <tr>
+                                <th>번호</th>
+                                <th>고객명</th>
+                                <th>전화번호</th>
+                                <th>문의 유형</th>
+                                <th>통화 시작</th>
+                                <th>통화 종료</th>
+                                <th>통화 시간</th>
+                                <th>상담 내용</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 페이징 처리 -->
+                <div class= "page">
+                    <ul class="pagination2"></ul>
+                </div>
+            </div>
+        </div>
+    </div><!-- [e] wrap -->
+
+    <script src = "//code.jquery.com/jquery-3.3.1.min.js"   type = "text/javascript"></script>
+    <script src = "/lib/client/index.js"               ></script>
+    <script src = "/lib/browser/startstopbutton.js"    ></script>
+    <!-------------- SOCKET.IO CLIENT, AJAX 통신 -------------->
+    <script src = "/socket.io/socket.io.js" type = "text/javascript"></script>
+    <script>
+        // 상담사와의 연결
+        let message         = "";
+        const web_socket    = io.connect('https://211.41.186.209:8888', { path: '/socket.io', transports: ['websocket'] });
+
+        let callinfo_id;
+        let call_seq = 0;
+        
+        let client_id;     
+        let client_phone;
+        let counsel_detail;
+        let group_type;
+
+        let str = `   ** 시스템에서 자동발신 되는 메세지입니다. **`;
+
+        // 소켓 연결
+        web_socket.on('connect', () => { console.log('웹 소켓 연결 성공'); });
+
+        // 연결 해제(disconnect) 이벤트 처리
+        web_socket.on('disconnect', (reason) => { console.log(reason); });
+
+        // 서버에서 "server_msg" 이름으로 보낸 데이터 수신
+        web_socket.on('server_msg', (data) => {
+            console.log(data);
+
+            message += data;
+            message += "\n";
+
+            document.getElementById('EventMsg').value = message;
+            document.getElementById('EventMsg').scrollTop = document.getElementById('EventMsg').scrollHeight;
+        });
+
+        // 자동 코칭 메세지 수신
+        web_socket.on('auto_msg', (data) => {
+            console.log(data);
+
+            message += data;
+            message += "\n";
+                
+            document.getElementById('EventMsg').value = message;
+            document.getElementById('EventMsg').scrollTop = document.getElementById('EventMsg').scrollHeight;
+        });
+
+        // 상담관리자로부터 수동 코칭 메세지 수신
+        web_socket.on('admin_msg', (data) => {
+            console.log(`${data}`);
+
+            message += data;
+            message += "\n";
+
+            document.getElementById('EventMsg').value = message;
+            document.getElementById('EventMsg').scrollTop = document.getElementById('EventMsg').scrollHeight;
+        });
+
+        // 에러 발생(error) 이벤트 처리
+        web_socket.on('error', (error) => { console.log(`에러 발생: ${error}`); });
+    </script><!-- [e] 소켓 통신 -->
+    <!-------------- 녹취 파일 재생 및 버튼 이벤트 -------------->
+    <script>
+        // 1. 상담 고객 정보 저장 이벤트
+        $('.client_save').click(function() {
+            let selectOption    = document.getElementById('exampleFormControlSelect2');
+
+            // 상담원 화면에서 입력 값 받아오기
+            client_id           = document.getElementById('client_name').value;
+            client_phone        = document.getElementById('client_phone').value;
+            counsel_info        = document.getElementById('counsel_info').value;
+            group_type          = selectOption.options[selectOption.selectedIndex].text;
+
+            if((group_type == "선택") && (client_id, client_phone, counsel_info) == "") {
+                alert("통화중인 상태가 아닙니다.");
+                return false;
+            }
+
+            if (client_id == "") {
+                alert('상담 고객명을 입력해주세요');
+                return false;
+            }
+
+            if(group_type == "일반문의") {
+                group_type = 1;
+            } else if (group_type == "민원접수") {
+                group_type = 2;
+            } else if (group_type == "제품판매") {
+                group_type = 3;
+            } else if (group_type == "기타문의") {
+                group_type = 4;
+            } else {
+                alert('상담 유형을 선택 해주세요.');
+                return false;
+            }
+
+            if (client_phone == "") {
+                alert('고객 전화번호를 입력해주세요');
+                return false;
+            }
+
+            if (counsel_info == "") {
+                alert('상담 내역을 입력해주세요');
+                return false;
+            } 
+            
+            $.ajax({
+                url: '/callCenter/clients_details?callinfo_id='+callinfo_id+'&client_id='+client_id+
+                        '&client_phone='+client_phone+'&counsel_detail='+counsel_info+'&group_type='+group_type,
+                dataType: 'json',
+                method: 'GET',
+                success: function(result) {
+                    if(result) {
+                        console.log(result);
+                    }
+                }
+            });
+            
+            // 입력 값 초기화
+            $('#client_name').val('');
+            $('#client_phone').val('');
+            $('#counsel_info').val('');
+            
+            $('#exampleFormControlSelect2 option:eq(0)').prop('selected', true);
+            $('#exampleFormControlSelect2').find("select").selectpicker('refresh');
+        });
+        
+        // 2. 통화 종료 클릭 이벤트
+        $('.stopButton1').click(function() {
+            //Ajax GET Method TEST
+            $.ajax({
+                url: '/restAPI/update_call_end?callinfo_id='+callinfo_id,
+                dataType: 'json',
+                type: 'GET',
+                success: function(result) {
+                    if (result) {
+                        console.log('성공\n' + JSON.stringify(result));
+                    }
+                }
+            });
+        });
+        
+        // 3. 통화 이력 조회
+        $('.callHistoryButton').click(function() {
+            $.ajax({
+                type: 'GET',
+                url: '/callCenter/call_history',
+                async: true,
+                dataType: 'JSON',
+                error: function() {
+                    alert('통신 실패');
+                },
+                success: function(result) {
+                    if(result == "") {
+                        $('#myTable tbody tr').empty();
+
+                        let row = `<tr id="hide"><td colspan="8">표시할 데이터가 없습니다</td></tr>`;
+                        $('#myTable').append(row);
+                    } else {
+                        $('#myTable tbody tr').empty();
+
+                        for (let i=0; i<result.length; i++) {
+                            call_seq++;
+
+                            if(result[i].client_id == null) {
+                                result[i].client_id = '';
+                            }
+
+                            if(result[i].client_phone == null) {
+                                result[i].client_phone = '';
+                            }
+
+                            if (result[i].group_type == 1) {
+                                result[i].group_type = '일반문의';
+                            } else if (result[i].group_type == 2) {
+                                result[i].group_type = '민원접수';
+                            } else if (result[i].group_type == 3) {
+                                result[i].group_type = '제품판매';
+                            } else if (result[i].group_type == 4) {
+                                result[i].group_type = '기타문의';
+                            } else {
+                                result[i].group_type = '';
+                            }
+
+                            if(result[i].disconnect_dt == null) {
+                                result[i].disconnect_dt = '';
+                            }
+
+                            if(result[i].counsel_detail == null) {
+                                result[i].counsel_detail = '';
+                            }
+
+                            let row = $(`<tr class="hidden"><td>${call_seq}</td><td>${result[i].client_id}</td><td>${result[i].client_phone}</td><td>${result[i].group_type}</td>
+                                <td>${result[i].connect_dt}</td><td>${result[i].disconnect_dt}</td><td>${result[i].call_time}</td><td>${result[i].counsel_detail}</td></tr>`);
+                            
+                            if ( $('#myTable > tbody tr').length >= 5 ) {
+                                return false;
+                            } else {
+                                $('#myTable').append(row);
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        $(document).ready(function() {
+            // 0. 가장 최근 감정상태 가져오기
+            $.ajax({
+                type: 'GET',
+                url: '/callCenter/emotion_type',
+                async: true,
+                dataType: 'JSON',
+                error: function(err) {
+                    alert(`통신 실패 - ${err}`);
+                },
+                success: function(result) {
+                    $('.agent_emotion').empty();
+
+                    if(result.length > 0) {
+                        if(result[0].emotion_type == '5') {
+                            let img = `최근 감성상태 <img src="/images/smile.png" alt="기쁨" width="25px" height="25px">`;
+                            $('.agent_emotion').append(img);
+                        } else if(result[0].emotion_type == '6') {
+                            let img = `최근 감성상태 <img src="/images/sad.png" alt="슬픔" width="25px" height="25px">`;
+                            $('.agent_emotion').append(img);
+                        } else if(result[0].emotion_type == '7') {
+                            let img = `최근 감성상태 <img src="/images/angry.png" alt="화남" width="25px" height="25px">`;
+                            $('.agent_emotion').append(img);
+                        } else if(result[0].emotion_type == '10') {
+                            let img = `최근 감성상태 <img src="/images/peaceful.png" alt="평온" width="25px" height="25px">`;
+                            $('.agent_emotion').append(img);
+                        } else {
+                            let img = `최근 감성상태 <img src="/images/close.png" alt="없음" width="15px" height="15px">`;
+                            $('.agent_emotion').append(img);
+                        }
+                    } else {
+                        let img = `Oops, Sorry. Page is not founded! <img src="/images/error.png" alt="404에러" width="30px" height="30px">`;
+                        $('.agent_emotion').append(img);
+                    }
+                }
+            })
+        });
+    </script><!-- [e] 상담정보 관련 이벤트 -->
+
+    <!-------------- 페이징 -------------->
+    <script>
+        //페이징 처리(페이지 개수 정하는 기능 필요, prev/next 기능 수정-동작x)
+        function pagination2() {
+            let req_num_row     = 5;
+            let $tr             = jQuery('.counseling_list tbody tr');
+            let total_num_row   = $tr.length;
+            let num_pages       = 0;
+            
+            if(total_num_row % req_num_row == 0) {
+                num_pages=total_num_row / req_num_row;
+            }
+
+            if(total_num_row % req_num_row >= 1) {
+                num_pages = total_num_row / req_num_row;
+                num_pages++;
+                num_pages = Math.floor(num_pages++);
+            }
+            
+            jQuery('.pagination2').append("<li><a class=\"prev\">이전</a></li>");
+            
+            for(let i=1; i<=num_pages; i++){
+                jQuery('.pagination2').append("<li><a>"+i+"</a></li>");
+                jQuery('.pagination2 li:nth-child(2)').addClass("active");
+                jQuery('.pagination2 a').addClass("pagination-link");
+            }
+            
+            jQuery('.pagination2').append("<li><a class=\"next\">다음</a></li>");
+            
+            $tr.each(function(i) {
+                jQuery(this).hide();
+
+                if(i+1 <= req_num_row) {
+                    $tr.eq(i).show();
+                }
+            });
+            
+            jQuery('.pagination2 a').click('.pagination-link', function(e) {
+                e.preventDefault();
+                $tr.hide();
+                let page=jQuery(this).text();
+                let temp=page-1;
+                let start=temp*req_num_row;
+                let current_link = temp;
+                
+                jQuery('.pagination2 li').removeClass("active");
+                jQuery(this).parent().addClass("active");
+            
+                for(let i=0; i< req_num_row; i++){
+                    $tr.eq(start+i).show();
+                }
+                
+                if(temp >= 1){
+                    jQuery('.pagination2 li:first-child').removeClass("disabled");
+                } else {
+                    jQuery('.pagination2 li:first-child').addClass("disabled");
+                }
+            });
+        
+            jQuery('.prev').click(function(e) {
+                e.preventDefault();
+                jQuery('.pagination2 li:first-child').removeClass("active");
+            });
+        
+            jQuery('.next').click(function(e) {
+                e.preventDefault();
+                jQuery('.pagination2 li:last-child').removeClass("active");
+            });
+        }
+        
+        jQuery('document').ready(function(){
+            pagination2();
+            jQuery('.pagination2 li:first-child').addClass("disabled");
+        });
+    </script><!-- [e] 페이징 -->
+</body>
+</html>

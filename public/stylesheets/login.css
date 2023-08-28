@@ -1,0 +1,75 @@
+/* body {
+    background-color: #4a4f5a;
+}
+
+.loginForm {
+    background-color: white;
+    margin: 15em auto 0 auto;
+    border-radius: 1em;
+    width: 30%;
+    height: 30em;
+}
+
+.loginForm h1 {
+    font-size: 3em;
+    padding-top: 2em;
+    text-align: center;
+}
+
+.loginForm form {
+    width: 90%;
+    margin: 3em auto 0 auto;
+    font-size: 1em;
+    overflow: hidden;
+}
+
+form input {
+    width: 50%;
+    height: 2em;
+    padding-left: 0.5em;
+    margin-bottom: 2%;
+}
+
+form .submit {
+    display: block;
+    width: 70%;
+    height: 4em;
+    border: none;
+    background-color: deepskyblue;
+    font-weight: bold;
+    margin: 8% auto 0 auto;
+    transition-duration: 0.5s;
+}
+
+form .submit:hover {
+    background-color: aquamarine;
+}
+
+form span:nth-child(odd) {
+    margin: auto 10% auto 10%;
+} */
+
+body {
+    font-family: 'NanumSquareRound';
+}
+
+.bd-placeholder-img {
+    font-size: 1.125rem;
+    text-anchor: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+@media (min-width: 768px) {
+    .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+    }
+}
+
+@font-face {
+    font-family: 'NanumSquareRound';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumSquareRound.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}

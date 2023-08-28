@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/bootstrap-5.1.3-dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/stylesheets/styles.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
+    <link href="/stylesheets/counseling.css"rel="stylesheet" type="text/css" />
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <link href="#"rel="shortcut icon" />
+    <title><%= title %></title>
+</head>
+<body>
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark shadow">
+        <!-- Navbar Brand-->
+        <a class= "navbar-brand logo" href= "/manage"><img src= "/images/neighbor_white.png" alt= "네이버시스템" width="220px;"/></a>
+        
+        <!-- Sidebar Toggle-->
+        <button class= "btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id= "sidebarToggle" href= "#!"><i class= "fas fa-bars"></i></button>
+        
+        <!-- Navbar Search-->
+        <form class= "d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+            <div class= "input-group">
+                <!-- <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+                <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button> -->
+            </div>
+        </form>
+        
+        <!-- Navbar-->
+        <ul class= "navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class= "nav-item dropdown">
+                <a class= "nav-link dropdown-toggle" id= "navbarDropdown" href= "#" role= "button" data-bs-toggle= "dropdown" aria-expanded= "false"><i class= "fas fa-user fa-fw"></i></a>
+                <ul class= "dropdown-menu dropdown-menu-end" aria-labelledby= "navbarDropdown">
+                    <li style= "text-align: center; padding-bottom: 0.5em;">
+                        <a href= "#" class= "change_info">개인정보 수정</a>
+                    </li>
+                    <li>
+                        <form action= "/process/logout" method= "get">
+                            <button class= "manage_signout" type= "submit" style= "border: none; outline:0;">로그아웃</button>
+                        </form>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+                        <a class="nav-link" href="/manage">전체 감성현황</a>
+                        <a class="nav-link" href="/manage/statistics">감성상태 통계분석</a>
+                        <a class="nav-link" href="/manage/230811_dashboard">감성현황 대시보드</a>
+                        <a class="nav-link" href="/manage/monitoring">상담사 통화이력</a>
+                        <a class="nav-link" href="/manage/counseling">상담사 코칭</a>
+                    </div>
+                </div>
+
+                <div class= "sb-sidenav-footer">
+                    <div class="small" style="text-align: center;">Logged in as: Admin</div>
+                </div>
+            </nav>
+        </div>
+        
+        <div id="layoutSidenav_content" class="container-fluid">
+            <main class="col-md-9 ms-sm-auto col-lg-12 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h3 style="font-weight: bold;">상담사 코칭</h3>
+                </div>
+                
+                <div class="container-fluid auto_coaching_list" id="auto_coaching_list">
+                    <!-- 상담사 코칭(자동)조건 설정 -->
+                    <div>
+                        <form name="auto_counsel_btns" action="/manage/counseling" method="get" class="auto_counsel_list" style="margin-bottom: 1%;">
+                            <h5 class="auto_counsel_h5" style="font-weight: bold;">코칭 조건설정</h5>
+                            <div class="auto_counsel_btnList" style="margin-top: 2%;">  
+                                <button class="counsel_reg_btn btn btn-sm btn-primary" onclick="movePage();">등록</button>
+                                <button class="counsel_del_btn btn btn-sm btn-outline-danger" type="submit">삭제</button>
+                                <button class="counsel_search_btn btn btn-sm btn-primary" onClick="window.location.reload()">조회</button>
+                            </div>
+                        </form>
+
+                        <div class="update_input">
+                            <form name="counseling_form" action="/manage/counseling_edit" method="get">
+                                <input name="autoSeq" class="form-control form-control-sm" type="text" id="cInput0" style="visibility: hidden; display:none"/>
+
+                                <div class="input-group">
+                                    <label class="input-group-text">사용 여부</label>
+                                    <select name="useUnuse" id="cInput1" class="form-select form-select-sm edit_select" disabled></select>
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label class="input-group-text">기준 시간(초)</label>
+                                    <select name="standardMin" id="cInput2" class="form-select form-select-sm edit_select" disabled></select>
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label class="input-group-text">초과 횟수(화남)</label>
+                                    <input name="overAgner" class="form-control form-control-sm" type="number" min="0" id="cInput3" disabled/>
+                                </div>
+
+                                <div class="input-group">
+                                    <label class="input-group-text">초과 횟수(슬픔)</label>
+                                    <input name="overSad" class="form-control form-control-sm" type="number" min="0" id="cInput4"d disabled/>
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label class="input-group-text">코칭 구분</label>
+                                    <select name="autoCoach" id="cInput5" class="form-select form-select-sm edit_select" disabled></select>
+                                </div>
+                                
+                                <div class="input-group coachMsg">
+                                    <label class="input-group-text">코칭 메세지</label>
+                                    <input name="autoDetail" class="form-control form-control" type="text" id="cInput6" style="margin-bottom: 2%;" disabled/>
+                                </div>
+                                
+                                <button class="counsel_update_btn btn btn-sm btn-primary" type="submit" disabled>수정</button>
+                                <button class="counsel_reset_btn btn btn-sm btn-outline-primary" type="reset" disabled>초기화</button>
+                            </form>
+                        </div>
+
+                        <table id="auto_counsel_table" class="auto_counsel_table table table-striped table-hover" style="text-align: center; margin-top:1%;">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="width: 3%;"><input type="checkbox" name="all" onclick="allselect(this.checked)"></th>
+                                    <th scope="col" style="width: 5%;">번호</th>
+                                    <th scope="col" style="width: 10%;">사용 여부</th>
+                                    <th scope="col" style="width: 10%;">기준 시간</th>
+                                    <th scope="col" style="width: 10%;">화남(초과)</th>
+                                    <th scope="col" style="width: 10%;">슬픔(초과)</th>
+                                    <th scope="col" style="width: 10%;">코칭 구분</th>
+                                    <th scope="col" style="width: 32%;">코칭 메세지</th>
+                                    <th scope="col" style="width: 10%;"></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <% if (condition_set.length == 0) { %> 
+                                    <tr><td colspan="9">표시할 데이터가 없습니다</td></tr>
+                                <% } else { %>
+                                    <% for(var i=0; i < condition_set.length; i++) { 
+                                        let data = condition_set[i]; %>
+                                
+                                        <tr id="jsTableRow" class="jsTableRow" style="cursor: default; user-select:none">
+                                            <td><input id="chkCondition" type="checkbox" name="row_CheckBox"></td>
+                                            
+                                            <!-- 시퀀스 -->
+                                            <% let data_seq = data.auto_seq; %>
+                                            <td scope="row"><%= data_seq %></td>
+
+                                            <!-- 조건 사용 여부 -->
+                                            <% let data_useUnuse = data.use_unuse; %>
+                                            <% 
+                                                if(data_useUnuse == 'Y') {%>
+                                                    <td scope="row">사용</td>
+                                                <%} else {%>
+                                                    <td scope="row">미사용</td>
+                                                <%}
+                                            %>
+
+                                            <!-- 기준 시간 -->
+                                            <td scope="row"><%= data.standard %>초</td>
+
+                                            <!-- 초과 횟수(화남) -->
+                                            <td scope="row"><%= data.over_anger %>회</td>
+
+                                            <!-- 초과 횟수(슬픔) -->
+                                            <td scope="row"><%= data.over_sad %>회</td>
+
+                                            <!-- 코칭 구분 -->
+                                            <% 
+                                                if(data.auto_coach == 'A') {%>
+                                                    <td scope="row">자동</td>
+                                                <%} else {%>
+                                                    <td scope="row">수동</td>
+                                                <%}
+                                            %>
+
+                                            <!-- 자동 코칭 메세지 내용 -->
+                                            <td scope="row"><%= data.auto_detail %></td>
+
+                                            <!-- 조건 값 불러오기 -->
+                                            <td scope="row"><button class="counsel_load_btn btn btn-sm btn-outline-primary" type="submit">값 불러오기</button></td>
+                                        </tr>
+                                    <% } %>
+                                <% } %>
+                            </tbody>
+                        </table>
+
+                        <!-- 페이징 처리 -->
+                        <ul class="pagination"></ul>
+                    </div>
+
+                    <!-- 상담사 코칭(수동) 리스트-->
+                    <div>
+                        <form name="manual_counsel_btns" action="/manage/counseling" method="get" class="manual_counsel_list">
+                            <h5 style="font-weight: bold;">관리자 수동 코칭</h5>
+                            <div class="row top">
+                                <div class="update_input">       
+                                    <div class="input-group" style="margin-top: 1%;">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="basic-addon1" style="width: 100%;">상담사</span>
+                                        </div>
+
+                                        <select name="passive_select_name" class="form-select">
+                                            <option selected>전체</option>
+                                            <% for(let i=0; i<agent_name.length; i++){ %>
+                                                <option value=`<%= i %>`><%= agent_name[i].agent_name %></option>
+                                            <% } %>
+                                        </select>
+
+                                        <button class="manual_search_btn btn btn-outline-primary" type="submit" style="margin-left: 0 0 0 1%;">검색</button>
+                                    </div>
+
+                                    <table class="passive_counsel_table table table-striped table-hover" style="text-align: center;">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" style="width: 5%;">번호</th>
+                                                <th scope="col" style="width: 15%;">날짜</th>
+                                                <th scope="col" style="width: 15%;">기준 시간(초)</th>
+                                                <th scope="col" style="width: 15%;">이름</th>
+                                                <th scope="col" style="width: 15%;">화남(초과)</th>
+                                                <th scope="col" style="width: 15%;">슬픔(초과)</th>
+                                                <th scope="col" style="width: 10%;">통화 건수</th>
+                                                <th scope="col" style="width: 10%;"></th>
+                                            </tr>
+                                        </thead>
+            
+                                        <tbody>
+                                            <% if(condition_passive.length == 0) { %> 
+                                                <tr><td colspan="8">표시할 데이터가 없습니다</td></tr>
+                                            <% } else { %>
+                                                <% for(var i=0; i< condition_passive.length; i++) {
+                                                    let data = condition_passive[i]; %>
+            
+                                                    <tr>
+                                                        <!-- 시퀀스 -->
+                                                        <td scope="row"><%= i+1 %></td>
+            
+                                                        <!-- 날짜 -->
+                                                        <% 
+                                                            let data_callDate = data.call_date;
+                                                            
+                                                            let y = data_callDate.substr(0, 4);
+                                                            let m = data_callDate.substr(4, 2);
+                                                            let d = data_callDate.substr(6, 2);
+            
+                                                            let yMd = `${y}년 ${m}월 ${d}일`;    
+                                                        %>
+                                                        <td scope="row" id="getAgentDate"><%= yMd %></td>
+            
+                                                        <!-- 기준 시간(초)에 따라 시간 더해서 표출 -->
+                                                        <%
+                                                            let data_callTime = data.call_time;
+                                                            let data_callTimeStan = data.call_timeStan.replace(/:/gi, "");
+            
+                                                            let h = data_callTime.substr(0, 2);
+                                                            let min = data_callTime.substr(3, 2);
+                                                            let s = data_callTime.substr(6, 2);
+                                                                                                        
+                                                            let yMd2 = `${h}:${min}:${s}`;
+            
+                                                            let h2 = data_callTimeStan.substr(0, 2);
+                                                            let min2 = data_callTimeStan.substr(2, 2);
+                                                            let s2 = data_callTimeStan.substr(4, 2);
+            
+                                                            let yMd3 = `${h2}:${min2}:${s2}`;
+                                                        %>
+                                                        <td scope="row" id="getAgentTime"><%= yMd2 + ' ~ ' + yMd3 %></td>
+            
+                                                        <!-- 이름 -->
+                                                        <td scope="row" id="getAgentName"><%= data.agent_name %></td>
+            
+                                                        <!-- 화남 조건 -->
+                                                        <td scope="row"><%= data.auto_over_anger%>회</td>
+            
+                                                        <!-- 슬픔 조건 -->
+                                                        <td scope="row"><%= data.auto_over_sad%>회</td>
+            
+                                                        <!-- 통화 건수 -->
+                                                        <td scope="row"><%= data.call_count%>건</td>
+            
+                                                        <!-- 코칭 메세지 팝업 창 호출 -->
+                                                        <td scope="row"><button class="agent_coach_btn btn btn-sm btn-outline-warning" type="submit">코칭하기</button></td>
+                                                    </tr>
+                                                <% } %>
+                                            <% } %>                                   
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- 페이징 처리 -->
+                        <ul class="pagination2"></ul>
+                    </div>
+
+                    <!-- 상담사 코칭 이력 -->
+                    <div>
+                        <form name="counsel_history_btns" action="/manage/counsel_history" method="get" class="counsel_history_list">
+                            <h5 class="counsel_history_h5 mb-2" style="font-weight: bold; display:block; width:100%;">코칭 이력</h5>
+                            <div class="counsel_history_btnList">
+                                <select name="stat_selected" class="form-select" aria-label="Default select example" id="counsel_history_select">
+                                    <option selected>전체</option>
+                                    <option value = "1">자동</option>
+                                    <option value = "2">수동</option>
+                                </select>
+
+                                <div class="btn-toolbar mb-2 mb-md-0" style="width:80%;">
+                                    <p><input name="dates" type="text" class="form-control history_calender" id="counsel_history_date" style="width: 120%;"></input></p>
+                                    <p style="margin-left: 4.5%;"><input class="counsel_search_btn btn btn-outline-primary" type="button" value="검색"></p>
+                                </div>
+                            </div>
+                        </form>
+
+                        <table class="counsel_history_table table table-striped" style="text-align: center; margin-top:1%;" id="counsel_history_table">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="width: 5%;">No</th>
+                                    <th scope="col" style="width: 5%;">ID</th>
+                                    <th scope="col" style="width: 10%;">상담사 명</th>
+                                    <th scope="col" style="width: 10%;">코칭 유형</th>
+                                    <th scope="col" style="width: 10%;">기준 시간</th>
+                                    <th scope="col" style="width: 30%;">코칭 내역</th>
+                                    <th scope="col" style="width: 30%;">특이사항</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <% if(counsel_history.length == 0) { %> 
+                                    <tr id="hide"><td colspan="7">표시할 데이터가 없습니다</td></tr>
+                                <% } else { %>
+                                    <!-- 조회시 ajax를 통해 테이블 출력 -->
+                                    <% for(var i=0; i< counsel_history.length; i++) {
+                                        let data = counsel_history[i]; %>
+
+                                        <tr id="hide">
+                                            <!-- 시퀀스 -->
+                                            <td scope="row"><%= i+1 %></td>
+
+                                            <!-- 상담사 ID -->
+                                            <% let data_agentId = data.agent_id; %>
+                                            <td scope="row"><%= data_agentId %></td>
+
+                                            <!-- 상담사 이름 -->
+                                            <% let data_agentName = data.agent_name; %>
+                                            <td scope="row"><%= data_agentName %></td>
+
+                                            <!-- 코칭 유형(자/수동) -->
+                                            <% let data_autoCoach = data.auto_coach; %>
+                                            <td scope="row"><%= data_autoCoach %></td>
+
+                                            <!-- 조건 설정 시간 -->
+                                            <% let data_autoStandard = data.auto_standard; %>
+                                            <td scope="row"><%= data_autoStandard %>초</td>
+
+                                            <!-- 코칭 내역 -->
+                                            <% let data_autoDetail = data.auto_detail; %>
+                                            <td scope="row"><%= data_autoDetail %></td>
+
+                                            <!-- 특이사항 -->
+                                            <% 
+                                                let data_passEtc = data.pass_etc;
+
+                                                if(data.pass_etc == null | data.pass_etc == "") {
+                                                    data_passEtc = '시스템 자동 발신';
+                                                }
+                                            %>
+                                            <td scope="row"><%= data_passEtc %></td>
+                                        </tr>
+                                    <% } %>
+                                <% } %>
+                            </tbody>
+                        </table>
+
+                        <!-- 페이징 처리 -->
+                        <ul class="pagination3"></ul>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src= "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src= "https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src= "../bootstrap-5.1.3-dist/js/scripts.js"></script>
+    <script src= "https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src= "//code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src= "https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <!-- 상담사 수동코칭 이름 값 넘겨서 테이블에 표시 -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+        $('input[name="dates"]').daterangepicker();
+
+        // 상담관리자 웹소켓 연결
+        const socket = io.connect('https://211.41.186.209:8888', { path: '/socket.io', transports: ['websocket'] });
+        let agent_userName;
+
+        socket.on('connect', () => { console.log('상담관리자 연결 성공'); });
+
+        // 연결 해제(disconnect) 이벤트 처리
+        socket.on('disconnect', (reason) => { console.log(reason); });
+
+        // 에러 발생(error) 이벤트 처리
+        socket.on('error', (error)=>{ console.log(`오류 발생: ${error}`); });
+
+        // 웹 소켓 서버에게 상담사 이름 보내기 (상담관리자)
+        $(".agent_coach_btn").click(function() {
+            agent_userName = document.querySelector('#getAgentName').innerText;
+            agent_callDate = document.querySelector('#getAgentDate').innerText;
+            agent_callTime = document.querySelector('#getAgentTime').innerText;
+            
+            socket.emit('client_name', `${agent_callDate}`);
+            socket.emit('client_name', `${agent_callTime}`);
+            socket.emit('client_name', `${agent_userName}`);
+
+            movePage2();
+        })
+    </script>
+
+    <!-- 코칭 조건 설정 CRUD -->
+    <script type="text/javascript">
+        let tdArr = new Array();
+
+        // 행 클릭
+        $("#auto_counsel_table tbody tr").click(function() {
+            if ($(this).find("input").prop("checked")) {
+                $(this).find("input").prop("checked", false);
+            } else {
+                $(this).find("input").prop("checked", true);
+            }
+        });
+
+        // 코칭 이력 검색
+        $(".counsel_search_btn").on("click", function() {    
+            let select_myStatus        = document.getElementById('counsel_history_select').value;
+            let select_myTime          = document.getElementById('counsel_history_date').value;
+
+            // ajax로 여기에 테이블 조건 데이터 입력해야함
+            // 처음 페이지 렌더링 될 때는 오늘 날짜 기준으로 렌더링
+            $.ajax({
+                url: '/manage/counsel_history?stat_selected='+select_myStatus+'&dates='+select_myTime,
+                type: 'GET',
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function(data) {
+                    if(data.message === 'SUCCESS') {
+                        if(data.counsel_history == "") {
+                            $('#counsel_history_table tbody tr').empty();             
+
+                            let row = `<tr id="hide"><td colspan="7">표시할 데이터가 없습니다</td></tr>`;
+                            $('.counsel_history_table').append(row);
+                        } else {
+                            $('#counsel_history_table tbody tr').empty();
+
+                            // 데이터 길이만큼 ROW 추가
+                            for (let i=0; i<data.counsel_history.length; i++) {
+                                // EJS로 설정된 첫 행 삭제
+                                let hide_row = document.getElementById('hide');
+                                hide_row.style.display = 'none';
+
+                                let row = $(`<tr id="hide">
+                                    <td>${i+1}</td>
+                                    <td>${data.counsel_history[i].agent_id}</td>
+                                    <td>${data.counsel_history[i].agent_name}</td>
+                                    <td>${data.counsel_history[i].auto_coach}</td>
+                                    <td>${data.counsel_history[i].auto_standard}</td>
+                                    <td>${data.counsel_history[i].auto_detail}</td>
+                                    <td>${data.counsel_history[i].pass_etc}</td>
+                                </tr>`);
+                                    
+                                $('.counsel_history_table').append(row);
+                            }
+                        }
+                    }
+                },
+                error: function(err) {
+                    alert('데이터 수신 오류');
+                    alert(JSON.stringify(err));
+                }
+            });
+        });
+
+        // 조건 등록 페이지 팝업 창 호출 함수
+        function movePage() {
+            let popUrl      = '/manage/counseling_manage';
+            let popName     = '코칭세부조건설정';
+
+            let popupWidth  = 500;
+            let popupHeight = 550;
+
+            // 만들 팝업창의 width, height 크기의 1/2만큼 보정 값으로 빼줌
+            let popupX = (window.screen.width / 2) - (popupWidth / 2);
+            let popupY = (window.screen.height / 2) - (popupHeight / 2);
+
+            let popOptions  = "top="+popupY+",left="+popupX+",width="+popupWidth+",height="+popupHeight+",location=no,menubar=no,toolbar=no,scrollbars=no,resizable=no";
+            
+            window.open(popUrl, popName, popOptions);
+        }
+
+        // 상담사 수동코칭 메세지 팝업 창
+        function movePage2() {
+            let popUrl      = '/manage/coaching_message';
+            let popName     = '코칭메세지전송';
+
+            let popupWidth  = 500;
+            let popupHeight = 550;
+
+            // 만들 팝업창의 width, height 크기의 1/2만큼 보정 값으로 빼줌
+            let popupX = (window.screen.width / 2) - (popupWidth / 2);
+            let popupY = (window.screen.height / 2) - (popupHeight / 2);
+
+            let popOptions  = "top="+popupY+",left="+popupX+",width="+popupWidth+",height="+popupHeight+",location=no,menubar=no,toolbar=no,scrollbars=no,resizable=no";
+            
+            window.open(popUrl, popName, popOptions);
+        }
+
+        // 선택된 행 삭제 및 전체 삭제
+        $(".counsel_del_btn").click(function() {
+            let checkbox    = $("input[name=row_CheckBox]:checked");
+
+            if(checkbox.length == 0) {
+                alert('선택된 조건이 없습니다.');
+
+                return false;
+            }
+
+            checkbox.each(function(i) {
+                // checkbox.parent()            : checkbox의 부모는 <td>
+                // checkbox.parent().parent()   : <td>의 부모이므로 <tr>
+                let tr = checkbox.parent().parent().eq(i);
+                let td = tr.children();
+                
+                tdArr.push(td.eq(1).text());
+            })
+
+            $.ajax({
+                url: '/manage/counseling_deleting',
+                dataType: 'json',
+                type: 'GET',
+                data: {data:tdArr},
+                success: function(result) {
+                    if(result) {
+                        logger.info(result);
+                        alert('정상적으로 삭제되었습니다.');
+                        
+                        window.close();
+                    }
+                }
+            });
+
+            location.reload();
+        });
+
+        function allselect(bool){
+            let chks = document.getElementsByName("row_CheckBox");
+            for(let i = 0; i < chks.length; i++){
+                chks[i].checked = bool;
+            }
+        }
+        
+        // 해당 조건 값 불러오기
+        $(".counsel_load_btn").click(function() {
+            let checkbox = $("input[name=row_CheckBox]:checked");
+
+            if(checkbox.length == 0) {
+                alert('선택된 조건이 없습니다.');
+
+                return false;
+            } else if(checkbox.length == 1) {
+                checkbox.each(function(i) {
+                    $('#cInput1').attr('disabled', false);
+                    $('#cInput2').attr('disabled', false);
+                    $('#cInput3').attr('disabled', false);
+                    $('#cInput4').attr('disabled', false);
+                    $('#cInput5').attr('disabled', false);
+                    $('#cInput6').attr('disabled', false);
+
+                    // checkbox.parent()            : checkbox의 부모는 <td>
+                    // checkbox.parent().parent()   : <td>의 부모이므로 <tr>
+                    let tr = checkbox.parent().parent().eq(i);
+                    let td = tr.children();
+                    
+                    td.each(function(i) {
+                        tdArr.push(td.eq(i+1).text());
+                    })
+    
+                    document.getElementById("cInput0").value = tdArr[0];
+                    document.getElementById("cInput1").value = tdArr[1];
+                    document.getElementById("cInput2").value = tdArr[2];
+                    document.getElementById("cInput3").value = tdArr[3];
+                    document.getElementById("cInput4").value = tdArr[4];
+                    document.getElementById("cInput5").value = tdArr[5];
+                    document.getElementById("cInput6").value = tdArr[6];
+    
+                    // 누적 안되게 select box 초기화
+                    $('#cInput1').empty();
+                    $('#cInput2').empty();
+                    $('#cInput5').empty();
+                    
+                    let useUnuse = [{ id: 1, name: "사용"}, { id: 2, name: "사용안함"}];
+                    let closeTag1 ='';
+                    for(let i=0; i<useUnuse.length; i++) {
+                        if(useUnuse[i].name == tdArr[1]) {
+                            closeTag1 +=`<option value=${useUnuse[i].id} selected>${useUnuse[i].name}</option>\n`
+                        } else {
+                            closeTag1 += `<option value=${useUnuse[i].id}>${useUnuse[i].name}</option>\n`;
+                        }
+                    }
+                    $('#cInput1').append(closeTag1);               
+    
+                    let standardMin = [{ id: 1, name: 10}, { id: 2, name: 30}, { id: 3, name: 60}];
+                    let closeTag2 ='';
+                    for(let i=0; i<standardMin.length; i++) {
+                        if(standardMin[i].name == tdArr[2]) {
+                            closeTag2 +=`<option value=${standardMin[i].id} selected>${standardMin[i].name}</option>\n`
+                        } else {
+                            closeTag2 += `<option value=${standardMin[i].id}>${standardMin[i].name}</option>\n`;
+                        }
+                    }
+                    $('#cInput2').append(closeTag2);              
+    
+                    let autoCoach = [{ id: 1, name: "자동"}, { id: 2, name: "수동"}];
+                    let closeTag3 ='';
+                    for(let i=0; i<autoCoach.length; i++) {
+                        if(autoCoach[i].name == tdArr[5]) {
+                            closeTag3 +=`<option value=${autoCoach[i].id} selected>${autoCoach[i].name}</option>\n`
+                        } else {
+                            closeTag3 += `<option value=${autoCoach[i].id}>${autoCoach[i].name}</option>\n`;
+                        }
+                    }
+                    $('#cInput5').append(closeTag3);         
+                })
+    
+                let checkboxes = document.getElementsByName("row_CheckBox");
+                checkboxes.forEach((checkbox) => {
+                    checkbox.checked = false;
+                })
+                
+                $('.counsel_update_btn').attr('disabled', false);
+                $('.counsel_reset_btn').attr('disabled', false);
+    
+                tdArr = new Array();
+            } else {
+                alert('조건은 하나만 선택해주세요.');
+                return false
+            }
+        });
+        
+        // 수정 칸 초기화 버튼
+        $(".counsel_reset_btn").click(function() {
+            $('#cInput1').empty();
+            $('#cInput2').empty();
+            $('#cInput5').empty();
+
+            $('#cInput1').attr('disabled', true);
+            $('#cInput2').attr('disabled', true);
+            $('#cInput3').attr('disabled', true);
+            $('#cInput4').attr('disabled', true);
+            $('#cInput5').attr('disabled', true);
+            $('#cInput6').attr('disabled', true);
+
+            $('.counsel_update_btn').attr('disabled', true);
+        });
+
+        $(".counsel_update_btn").click(function() {
+            alert('정상적으로 수정되었습니다.');
+            location.reload();
+            /* $("#auto_coaching_list").load(window.location.href + "#auto_coaching_list"); */
+        });
+    </script>
+
+    <!-- 페이징 처리 -->
+    <script>
+        function pagination() {
+            let req_num_row     = 5;
+            let $tr             = jQuery('.auto_counsel_table tbody tr');
+            let total_num_row   = $tr.length;
+            let num_pages       = 0;
+            
+            if(total_num_row % req_num_row == 0) {
+                num_pages = total_num_row / req_num_row;
+
+            } else if(total_num_row % req_num_row >= 1) {
+                num_pages = total_num_row / req_num_row;
+                num_pages++;
+                num_pages = Math.floor(num_pages++);
+            }
+                
+            for(let i=1; i<=num_pages; i++){
+                jQuery('.pagination').append("<li><a>"+i+"</a></li>");
+                jQuery('.pagination li:nth-child(2)').addClass("active");
+                jQuery('.pagination a').addClass("pagination-link");
+            }
+            
+            $tr.each(function(i) {
+                jQuery(this).hide();
+                if(i+1 <= req_num_row) {
+                    $tr.eq(i).show();
+                }
+            });
+                
+            jQuery('.pagination a').click('.pagination-link', function(e) {
+                e.preventDefault();
+                $tr.hide();
+                let page=jQuery(this).text();
+                let temp=page-1;
+                let start=temp*req_num_row;
+                let current_link = temp;
+                
+                jQuery('.pagination li').removeClass("active");
+                jQuery(this).parent().addClass("active");
+            
+                for(let i=0; i< req_num_row; i++){
+                    $tr.eq(start+i).show();
+                }
+                
+                if(temp >= 1){
+                    jQuery('.pagination li:first-child').removeClass("disabled");
+                } else {
+                    jQuery('.pagination li:first-child').addClass("disabled");
+                }
+            });
+        }
+
+        function pagination2() {
+            let req_num_row     = 5;
+            let $tr             = jQuery('.passive_counsel_table tbody tr');
+            let total_num_row   = $tr.length;
+            let num_pages       = 0;
+            
+            if(total_num_row % req_num_row == 0) {
+                num_pages = total_num_row / req_num_row;
+
+            } else if(total_num_row % req_num_row >= 1) {
+                num_pages = total_num_row / req_num_row;
+                num_pages++;
+                num_pages = Math.floor(num_pages++);
+            }
+                
+            for(let i=1; i<=num_pages; i++){
+                jQuery('.pagination2').append("<li><a>"+i+"</a></li>");
+                jQuery('.pagination2 li:nth-child(2)').addClass("active");
+                jQuery('.pagination2 a').addClass("pagination2-link");
+            }
+            
+            $tr.each(function(i) {
+                jQuery(this).hide();
+                if(i+1 <= req_num_row) {
+                    $tr.eq(i).show();
+                }
+            });
+                
+            jQuery('.pagination2 a').click('.pagination2-link', function(e) {
+                e.preventDefault();
+                $tr.hide();
+                let page=jQuery(this).text();
+                let temp=page-1;
+                let start=temp*req_num_row;
+                let current_link = temp;
+                
+                jQuery('.pagination2 li').removeClass("active");
+                jQuery(this).parent().addClass("active");
+            
+                for(let i=0; i< req_num_row; i++){
+                    $tr.eq(start+i).show();
+                }
+                
+                if(temp >= 1){
+                    jQuery('.pagination2 li:first-child').removeClass("disabled");
+                } else {
+                    jQuery('.pagination2 li:first-child').addClass("disabled");
+                }
+            });
+        }
+
+        function pagination3() {
+            let req_num_row     = 5;
+            let $tr             = jQuery('.counsel_history_table tbody tr');
+            let total_num_row   = $tr.length;
+            let num_pages       = 0;
+        
+            if(total_num_row % req_num_row == 0) {
+                num_pages = total_num_row / req_num_row;
+            } else if(total_num_row % req_num_row >= 1) {
+                num_pages = total_num_row / req_num_row;
+                num_pages++;
+                num_pages = Math.floor(num_pages++);
+            }
+            
+            for(let i=1; i<=num_pages; i++){
+                jQuery('.pagination3').append("<li><a>"+i+"</a></li>");
+                jQuery('.pagination3 li:nth-child(2)').addClass("active");
+                jQuery('.pagination3 a').addClass("pagination3-link");
+            }
+            
+            $tr.each(function(i) {
+                jQuery(this).hide();
+                if(i+1 <= req_num_row) {
+                    $tr.eq(i).show();
+                }
+            });
+                    
+            jQuery('.pagination3 a').click('.pagination3-link', function(e) {
+                e.preventDefault();
+                $tr.hide();
+                let page=jQuery(this).text();
+                let temp=page-1;
+                let start=temp*req_num_row;
+                let current_link = temp;
+                
+                jQuery('.pagination3 li').removeClass("active");
+                jQuery(this).parent().addClass("active");
+            
+                for(let i=0; i< req_num_row; i++){
+                    $tr.eq(start+i).show();
+                }
+                
+                if(temp >= 1){
+                    jQuery('.pagination3 li:first-child').removeClass("disabled");
+                } else {
+                    jQuery('.pagination3 li:first-child').addClass("disabled");
+                }
+            });
+        }
+        
+        jQuery('document').ready(function(){
+            pagination();
+            jQuery('.pagination li:first-child').addClass("disabled");
+
+            pagination2();
+            jQuery('.pagination2 li:first-child').addClass("disabled");
+
+            pagination3();
+            jQuery('.pagination3 li:first-child').addClass("disabled");
+        });
+    </script>
+</body>
+</html>

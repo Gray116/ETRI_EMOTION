@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <!-- 부트스트랩 -->
+    <link href= "./bootstrap-5.1.3-dist/css/bootstrap.min.css" rel= "stylesheet">
+    <link href= "stylesheets/styles.css" rel= "stylesheet" type= "text/css"/>
+    <link href= "https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel= "stylesheet" />
+    <link href= "stylesheets/manage.css" rel= "stylesheet" type= "text/css"/>
+    <link href= "#" rel= "shortcut icon"/>
+</head>
+<body>
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark shadow">
+        <!-- Navbar Brand-->
+        <a class= "navbar-brand logo" href= "/manage"><img src= "/images/neighbor_white.png" alt= "네이버시스템" width="220px;"/></a>
+        
+        <!-- Sidebar Toggle-->
+        <button class= "btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id= "sidebarToggle" href= "#!"><i class= "fas fa-bars"></i></button>
+        
+        <!-- Navbar Search-->
+        <form class= "d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+            <div class= "input-group">
+                <!-- <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+                <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button> -->
+            </div>
+        </form>
+        
+        <!-- Navbar-->
+        <ul class= "navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class= "nav-item dropdown">
+                <a class= "nav-link dropdown-toggle" id= "navbarDropdown" href= "#" role= "button" data-bs-toggle= "dropdown" aria-expanded= "false"><i class= "fas fa-user fa-fw"></i></a>
+                <ul class= "dropdown-menu dropdown-menu-end" aria-labelledby= "navbarDropdown">
+                    <li style= "text-align: center; padding-bottom: 0.5em;">
+                        <a href= "#" class= "change_info">개인정보 수정</a>
+                    </li>
+                    <li>
+                        <form action= "/process/logout" method= "get">
+                            <button class= "manage_signout" type= "submit" style= "border: none; outline:0;">로그아웃</button>
+                        </form>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    
+    <div id= "layoutSidenav">
+        <div id= "layoutSidenav_nav">
+            <nav class= "sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class= "sb-sidenav-menu">
+                    <div class= "nav">
+                        <a class="nav-link" href="/manage">전체 감성현황</a>
+                        <a class="nav-link" href="/manage/statistics">감성상태 통계분석</a>
+                        <a class="nav-link" href="/manage/230811_dashboard">감성현황 대시보드</a>
+                        <a class="nav-link" href="/manage/monitoring">상담사 통화이력</a>
+                        <a class="nav-link" href="/manage/counseling">상담사 코칭</a>
+                    </div>
+                </div>
+                
+                <div class= "sb-sidenav-footer">
+                    <div class="small" style="text-align: center;">Logged in as: Admin</div>
+                </div>
+            </nav>
+        </div>
+        
+        <div id= "layoutSidenav_content">
+            <main class= "col-md-9 ms-sm-auto col-lg-12 px-md-4">
+                <div class= "d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h2 style="font-weight: bold;">상담사 감성현황</h4>
+                    <div class= "btn-toolbar mb-2 mb-md-0">
+                        <form class= "d-flex" role= "refresh">
+                            <input class= "btn btn-sm btn-outline-primary" type="button" value="새로 고침" onClick="window.location.reload()"/>
+                        </form>
+                    </div>
+                </div>
+
+                <div class= "row">
+                    <div class= "col-8">
+                        <div class= "row">
+                            <div class= "col-3">
+                                <div class= "box">
+                                    <img src= "images/smile.png" width= "60px" height= "60px" alt= "smile" style="margin-top: 5%;">
+                                    <% var cnt = 0;
+                                    for(var i= 0; i< result_count.length; i++) {
+                                        if( result_count[i]['emotion_type'] == '5' ) {%>
+                                            <p style="font-size: 1.5em;"><%= cnt=result_count[i]["count"]+'건' %></p>
+                                        <%}%>
+                                    <%}
+                                    
+                                    if( cnt == 0 ) {%>
+                                        <p style="font-size: 1.5em;">0건</p>
+                                    <%}%>
+                                </div>
+                            </div>
+                            <div class= "col-3">
+                                <div class= "box">
+                                    <img src= "images/peaceful.png" alt= "peaceful" width= "60px" height= "60px" style="margin-top: 5%;">
+                                    <% var cnt = 0;
+                                    for(let i= 0; i< result_count.length; i++) { 
+                                        if( result_count[i]['emotion_type'] == '10' ) {%>
+                                            <p style="font-size: 1.5em;"><%= cnt=result_count[i]["count"]+'건' %></p>
+                                        <%}%>
+                                    <%}
+                                    if( cnt == 0 ) {%>
+                                        <p style="font-size: 1.5em;">0건</p>
+                                    <%}%>
+                                </div>
+                            </div>
+                            <div class= "col-3">
+                                <div class= "box">
+                                    <img src= "images/angry.png" alt= "angry" width= "60px" height= "60px" style="margin-top: 5%;">
+                                    <% var cnt = 0;
+                                    for(let i= 0; i< result_count.length; i++) { 
+                                        if( result_count[i]['emotion_type'] == '7' ) {%>
+                                            <p style="font-size: 1.5em;"><%= cnt=result_count[i]["count"]+'건' %></p>
+                                        <%}%>
+                                    <%}
+                                    if( cnt == 0 ) {%>
+                                        <p style="font-size: 1.5em;">0건</p>
+                                    <%}%>
+                                </div>
+                            </div>
+                            <div class= "col-3">
+                                <div class= "box">
+                                    <img src= "images/sad.png" alt= "sad" width= "60px" height= "60px" style="margin-top: 5%;">
+                                    <% var cnt = 0;
+                                    for(let i= 0; i< result_count.length; i++) { 
+                                        if(result_count[i]['emotion_type']=='6') {%>
+                                            <p style="font-size: 1.5em;"><%= cnt=result_count[i]["count"]+'건' %></p>
+                                        <%}%>
+                                    <%}
+                                    if( cnt == 0 ) {%>
+                                        <p style="font-size: 1.5em;">0건</p>
+                                    <%}%>
+                                </div>
+                                <br>
+                            </div>
+                        </div>
+                        
+                        <div class= "gx-2">
+                            <div class= "col">
+                                <div class= "box">
+                                    <p>1시간 단위 감성 상태 추이</p>
+                                    <canvas id= "state_30" height= "80em;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class= "col-4 box">
+                        <p>금일 감성 분포</p>
+                        <canvas id= "oneHour" height= "250"></canvas>
+                    </div>
+                </div>
+
+                
+                <div class= "row" style="margin-top: 1%;">
+                    <p>그룹별 감성 수(건)</p>
+                    <div class= "col-3" style="margin-right: 0.325%;">
+                        <div class= "box"><p>일반 문의</p>
+                        <canvas id= "general_enquiries" height= "150"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class= "col-3" style="margin-right: 0.325%;">
+                        <div class= "box"><p>민원 접수</p>
+                        <canvas id= "Complaints" height= "150"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class= "col-3">
+                        <div class= "box"><p>제품 판매</p>
+                        <canvas id= "Product_sales" height= "150"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class= "col-3" style="margin-right: -0.65%;">
+                        <div class= "box"><p>기타 문의</p>
+                        <canvas id= "other_inquiries" height= "150"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- chart.js -->
+    <script src= "https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src= "//code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src= "https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+    <script src= "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin= "anonymous"></script>
+    <script src= "./bootstrap-5.1.3-dist/js/scripts.js"></script>
+    <script>
+        // 노동자 감성 현황(1시간 단위 감성 상태 추이) 그래프
+        var context= document.getElementById('state_30').getContext('2d');
+        var every_oneHour= JSON.parse('<%-JSON.stringify(every_oneHour) %>');
+        
+        let hour10_1= 0, hour10_2= 0, hour10_3= 0, hour10_4= 0,
+            hour11_1= 0, hour11_2= 0, hour11_3= 0, hour11_4= 0,
+            hour12_1= 0, hour12_2= 0, hour12_3= 0, hour12_4= 0,
+            hour13_1= 0, hour13_2= 0, hour13_3= 0, hour13_4= 0;
+    
+        let hour14_1= 0, hour14_2= 0, hour14_3= 0, hour14_4= 0,
+            hour15_1= 0, hour15_2= 0, hour15_3= 0, hour15_4= 0,
+            hour16_1= 0, hour16_2= 0, hour16_3= 0, hour16_4= 0,
+            hour17_1= 0, hour17_2= 0, hour17_3= 0, hour17_4= 0;
+    
+        for(let i= 0; i< every_oneHour.length; i++) { 
+            let data = every_oneHour[i];
+            if(data.hour == '10') {
+                if(data.emotion_type == '5') {
+                    hour10_1 = data.count;
+                }
+
+                if(data.emotion_type =='10') {
+                    hour10_2 = data.count;
+                }
+
+                if(data.emotion_type =='7') {
+                    hour10_3 = data.count;
+                }
+
+                if(data.emotion_type == '6') {
+                    hour10_4 = data.count;
+                }
+            }
+
+            if(data.hour == '11') {
+                if(data.emotion_type == '5') {
+                    hour11_1 = data.count;
+                }
+
+                if(data.emotion_type == '10') {
+                    hour11_2 = data.count;
+                }
+
+                if(data.emotion_type == '7') {
+                    hour11_3 = data.count;
+                }
+
+                if(data.emotion_type == '6') {
+                    hour11_4 = data.count;
+                }
+            }
+
+            if(data.hour == '12') {
+                if(data.emotion_type == '5') {
+                    hour12_1 = data.count;
+                }
+                if(data.emotion_type == '10') {
+                    hour12_2 = data.count;
+                }
+                if(data.emotion_type == '7') {
+                    hour12_3 = data.count;
+                }
+                if(data.emotion_type == '6') {
+                    hour12_4 = data.count;
+                }
+            }
+
+            if(data.hour == '13') {
+                if(data.emotion_type == '5') {
+                    hour13_1 = data.count;
+                }
+
+                if(data.emotion_type == '10') {
+                    hour13_2 = data.count;
+                }
+
+                if(data.emotion_type == '7') {
+                    hour13_3 = data.count;
+                }
+
+                if(data.emotion_type == '6') {
+                    hour13_4 = data.count;
+                }
+            }
+
+            if(data.hour == '14') {
+                if(data.emotion_type == '5') {
+                    hour14_1 = data.count;
+                }
+
+                if(data.emotion_type == '10') {
+                    hour14_2 = data.count;
+                }
+
+                if(data.emotion_type == '7') {
+                    hour14_3 = data.count;
+                }
+
+                if(data.emotion_type == '6') {
+                    hour14_4 = data.count;
+                }
+            }
+
+            if(data.hour == '15'){
+                if(data.emotion_type == '5'){
+                    hour15_1 = data.count;
+                }
+
+                if(data.emotion_type == '10'){
+                    hour15_2 = data.count;
+                }
+
+                if(data.emotion_type == '7'){
+                    hour15_3 = data.count;
+                }
+
+                if(data.emotion_type == '6'){
+                    hour15_4 = data.count;
+                }
+            }
+
+            if(data.hour == '16'){
+                if(data.emotion_type == '5'){
+                    hour16_1 = data.count;
+                }
+
+                if(data.emotion_type == '10'){
+                    hour16_2 = data.count;
+                }
+
+                if(data.emotion_type == '7'){
+                    hour16_3 = data.count;
+                }
+
+                if(data.emotion_type == '6'){
+                    hour16_4 = data.count;
+                }
+            }
+
+            if(data.hour == '17'){
+                if(data.emotion_type == '5'){
+                    hour17_1 = data.count;
+                }
+
+                if(data.emotion_type == '10'){
+                    hour17_2 = data.count;
+                }
+
+                if(data.emotion_type == '7'){
+                    hour17_3 = data.count;
+                }
+
+                if(data.emotion_type == '6'){
+                    hour17_4 = data.count;
+                }
+            }
+        }
+
+        var state_30 = new Chart(context, {
+            type: 'line',
+            data: {
+                labels: [ // x축 (9 to 6 기준)
+                    '10:00:00','11:00:00','12:00:00','13:00:00',
+                    '14:00:00','15:00:00','16:00:00','17:00:00'
+                ],
+                datasets: [
+                    {
+                        label: '슬픔',
+                        fill: true,
+                        data: [
+                            hour10_4, hour11_4, hour12_4, hour13_4,
+                            hour14_4, hour15_4, hour16_4, hour17_4
+                        ],
+                        borderColor: 'rgb(3, 141, 213)',
+                        backgroundColor: 'rgba(3, 141, 213)',
+                        borderWidth: 1.5,
+                        tension: 0, //직선차트
+                    } ,
+                    {
+                        label: '화남',
+                        fill: true,
+                        data: [
+                            hour10_3, hour11_3, hour12_3, hour13_3,
+                            hour14_3, hour15_3, hour16_3, hour17_3
+                        ],
+                        borderColor: 'rgb(255, 41,29)',
+                        backgroundColor: 'rgba(255, 41,29)',
+                        borderWidth: 1.5,
+                        tension:0, //직선차트
+                    } ,
+                    {
+                        label: '평온',
+                        fill: true,
+                        data: [
+                            hour10_2, hour11_2, hour12_2, hour13_2,
+                            hour14_2, hour15_2, hour16_2, hour17_2
+                        ],
+                        borderColor: 'rgb(103, 182, 51)',
+                        backgroundColor:'rgba(103, 182, 51)',
+                        borderWidth: 1.5,
+                        tension: 0, //직선차트
+                    },
+                    {
+                        label: '행복',
+                        fill: true,
+                        data: [
+                            hour10_1, hour11_1, hour12_1, hour13_1, 
+                            hour14_1, hour15_1, hour16_1, hour17_1
+                        ],
+                        borderColor: 'rgb(254, 225, 72)',
+                        backgroundColor: 'rgba(254, 225, 72)',
+                        borderWidth: 1.5,
+                        tension: 0, //직선차트
+                    },
+                ]
+            },
+            options: {
+                scales: {
+                    yAxes: [
+                        {
+                            stacked: true, // 누적 그래프
+                            ticks: {
+                                beginAtZero: true // 그래프 0부터 시작
+                            }
+                        }
+                    ]
+                }
+            }
+        });
+
+
+        // 금일 감성 분포 그래프
+        var context = document.getElementById('oneHour').getContext('2d');
+        var result_count= JSON.parse('<%-JSON.stringify(result_count) %>')
+        var countone=0, counttwo=0, countthird=0, countfour=0;
+    
+        for(var i= 0; i< result_count.length; i++) {
+            var data = result_count[i];
+            if(data.emotion_type == '5') {
+                countone = data.count;
+            }
+
+            if(data.emotion_type == '10') {
+                counttwo = data.count;
+            }
+
+            if(data.emotion_type == '7') {
+                countthird = data.count;
+            }
+
+            if(data.emotion_type == '6') {
+                countfour = data.count;
+            }
+        }
+
+        var oneHour = new Chart(context, {
+            type: 'doughnut',
+            data: { 
+                labels: [
+                    //x 축
+                    '행복','평온','화남','슬픔'
+                ],
+                datasets: [
+                    {
+                        label: 'test1',
+                        // x축 label에 대응되는 데이터 값
+                        data: [countone, counttwo, countthird, countfour], 
+                        backgroundColor: [
+                            'rgb(254, 225, 72)', 'rgb(103, 182, 51)', 'rgb(255, 41,29)', 'rgb(3, 141, 213)'
+                        ]
+                    }
+                ]
+            },
+            options: {
+                scales:{
+                },
+                plugins:{
+                    tooltips:{
+                        enabled: false
+                    }
+                },
+                cutoutPercentage: 40
+            }  
+        });
+
+
+        //그룹별 감성 수 그래프
+        var result_group= JSON.parse('<%-JSON.stringify(result_group) %>')
+        var group1_1= 0, group1_2= 0, group1_3= 0, group1_4= 0,
+            group2_1= 0, group2_2= 0, group2_3= 0, group2_4= 0,
+            group3_1= 0, group3_2= 0, group3_3= 0, group3_4= 0,
+            group4_1= 0, group4_2= 0, group4_3= 0, group4_4= 0;
+
+        for(let i= 0; i< result_group.length; i++) { 
+            let data = result_group[i];
+            if(data.group_type == '1') {
+                if(data.emotion_type =='5') {
+                    group1_1 = data.count;
+                }
+                
+                if(data.emotion_type =='10') {
+                    group1_2 = data.count;
+                }
+                
+                if(data.emotion_type =='7') {
+                    group1_3 = data.count;
+                }
+                
+                if(data.emotion_type =='6') {
+                    group1_4 = data.count;
+                }
+            }
+
+            if(data.group_type == '2') {
+                if(data.emotion_type == '5') {
+                    group2_1 = data.count;
+                }
+                
+                if(data.emotion_type == '10') {
+                    group2_2 = data.count;
+                }
+                
+                if(data.emotion_type == '7') {
+                    group2_3 = data.count;
+                }
+                
+                if(data.emotion_type == '6') {
+                    group2_4 = data.count;
+                }
+            }
+
+            if(data.group_type == '3'){
+                if(data.emotion_type == '5') {
+                    group3_1 = data.count;
+                }
+                
+                if(data.emotion_type == '10') {
+                    group3_2 = data.count;
+                }
+                
+                if(data.emotion_type == '7') {
+                    group3_3 = data.count;
+                }
+                
+                if(data.emotion_type == '6') {
+                    group3_4 = data.count;
+                }
+            }
+
+            if(data.group_type == '4'){
+                if(data.emotion_type == '5') {
+                    group4_1 = data.count;
+                }
+                
+                if(data.emotion_type == '10') {
+                    group4_2 = data.count;
+                }
+                
+                if(data.emotion_type == '7') {
+                    group4_3 = data.count;
+                }
+                
+                if(data.emotion_type == '6') {
+                    group4_4 = data.count;
+                }
+            }
+        }
+
+
+        //일반문의 그래프
+        var context = document.getElementById('general_enquiries').getContext('2d');
+        var general_enquiries = new Chart(context, {
+            type: 'bar', 
+            data: { 
+                labels: ['행복','평온','화남','슬픔'],
+                datasets: [
+                    { data: [group1_1,group1_2,group1_3,group1_4],
+                        backgroundColor: ['rgb(254, 225, 72)', 'rgb(103, 182, 51)', 'rgb(255, 41,29)', 'rgb(3, 141, 213)'],
+                        borderWidth: 1 //경계선 굵기
+                    } ,]
+            },
+            options: {
+                legend: {
+                    display: false //범례 제거
+                },
+                tooltips: {
+                        enabled: false
+                    },
+                    hover: {
+                        animationDuration: 0
+                    },
+                animation: { //그래프 데이터 표출
+                        duration: 1,
+                        onComplete: function () {
+                            var chartInstance = this.chart,
+                                ctx = chartInstance.ctx;
+                            ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+                            ctx.fillStyle = 'black';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+        
+                            this.data.datasets.forEach(function (dataset, i) {
+                                var meta = chartInstance.controller.getDatasetMeta(i);
+                                meta.data.forEach(function (bar, index) {
+                                    var data = dataset.data[index];							
+                                    ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                                });
+                            });
+                        }
+                    },
+                scales: {
+                    yAxes: [
+                        {
+                            ticks: {
+                                beginAtZero: true, //0부터 시작
+                                fontSize:14,
+                                max:50 //최대값 지정
+                            }
+                        }
+                    ]
+                }
+            }
+        });
+
+        //민원접수 그래프
+        var context = document.getElementById('Complaints').getContext('2d');
+        var Complaints = new Chart(context, {
+            type: 'bar', 
+            data: { 
+                labels: ['행복','평온','화남','슬픔'],
+                datasets: [
+                    { data: [group2_1,group2_2,group2_3,group2_4],
+                        backgroundColor: ['rgb(254, 225, 72)', 'rgb(103, 182, 51)', 'rgb(255, 41,29)', 'rgb(3, 141, 213)'],
+                        borderWidth: 1 //경계선 굵기
+                    } ,]
+            },
+            options: {
+                legend: {display: false //범례 제거
+                },
+                tooltips: {
+                        enabled: false
+                    },
+                    hover: {
+                        animationDuration: 0
+                    },
+                animation: {
+                        duration: 1,
+                        onComplete: function () {
+                            var chartInstance = this.chart,
+                                ctx = chartInstance.ctx;
+                            ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+                            ctx.fillStyle = 'black';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+        
+                            this.data.datasets.forEach(function (dataset, i) {
+                                var meta = chartInstance.controller.getDatasetMeta(i);
+                                meta.data.forEach(function (bar, index) {
+                                    var data = dataset.data[index];							
+                                    ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                                });
+                            });
+                        }
+                    },
+                scales: {
+                    yAxes: [
+                        {
+                            ticks: {
+                                beginAtZero: true, //0부터 시작
+                                fontSize:14,
+                                max:50
+                            }
+                        }
+                    ]
+                }
+            }
+        });
+        
+
+        //제품판매 그래프
+        var context = document.getElementById('Product_sales').getContext('2d');
+        var Product_sales = new Chart(context, {
+            type: 'bar', 
+            data: { 
+                labels: ['행복','평온','화남','슬픔'],
+                datasets: [
+                    { data: [group3_1,group3_2,group3_3,group3_4],
+                        backgroundColor: ['rgb(254, 225, 72)', 'rgb(103, 182, 51)', 'rgb(255, 41,29)', 'rgb(3, 141, 213)'],
+                        borderWidth: 1 //경계선 굵기
+                    } ,]
+            },
+            options: {
+                legend: {display: false //범례 제거
+                },
+                tooltips: {
+                        enabled: false
+                    },
+                    hover: {
+                        animationDuration: 0
+                    },
+                animation: {
+                        duration: 1,
+                        onComplete: function () {
+                            var chartInstance = this.chart,
+                                ctx = chartInstance.ctx;
+                            ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+                            ctx.fillStyle = 'black';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+        
+                            this.data.datasets.forEach(function (dataset, i) {
+                                var meta = chartInstance.controller.getDatasetMeta(i);
+                                meta.data.forEach(function (bar, index) {
+                                    var data = dataset.data[index];							
+                                    ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                                });
+                            });
+                        }
+                    },
+                scales: {
+                    yAxes: [
+                        {
+                            ticks: {
+                                beginAtZero: true, //0부터 시작
+                                fontSize:14,
+                                max:50
+                            }
+                        }
+                    ]
+                }
+            }
+        });
+        
+
+        //기타문의 그래프
+        var context = document.getElementById('other_inquiries').getContext('2d');
+        var other_inquiries = new Chart(context, {
+            type: 'bar', 
+            data: { 
+                labels: ['행복','평온','화남','슬픔'],
+                datasets: [
+                    { data: [group4_1,group4_2,group4_3,group4_4],
+                        backgroundColor: ['rgb(254, 225, 72)', 'rgb(103, 182, 51)', 'rgb(255, 41,29)', 'rgb(3, 141, 213)'],
+                        borderWidth: 1 //경계선 굵기
+                    } ,]
+            },
+            options: {
+                legend: {display: false //범례 제거
+                },
+                tooltips: {
+                        enabled: false
+                    },
+                    hover: {
+                        animationDuration: 0
+                    },
+                animation: {
+                        duration: 1,
+                        onComplete: function () {
+                            var chartInstance = this.chart,
+                                ctx = chartInstance.ctx;
+                            ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+                            ctx.fillStyle = 'black';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+        
+                            this.data.datasets.forEach(function (dataset, i) {
+                                var meta = chartInstance.controller.getDatasetMeta(i);
+                                meta.data.forEach(function (bar, index) {
+                                    var data = dataset.data[index];							
+                                    ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                                });
+                            });
+                        }
+                    },
+                scales: {
+                    yAxes: [
+                        {
+                            ticks: {
+                                beginAtZero: true, //0부터 시작
+                                fontSize:14,
+                                max:50
+                            }
+                        }
+                    ]
+                }
+            }
+        });
+    function handler(e){ alert(e.target.value); }
+    </script>
+</body>
+</html>

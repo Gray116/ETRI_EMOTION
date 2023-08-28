@@ -1,0 +1,281 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'NanumSquareRound';
+    height: 100vh;
+}
+
+@font-face {
+    font-family: 'NanumSquareRound';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumSquareRound.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+}
+
+.png {
+    display:inline-block;
+}
+
+img { 
+    display:inline;
+    margin : auto;
+}
+
+.logo {
+    padding: 0;
+  }
+  
+.logo img {
+    display: block;
+    margin: 0 auto;
+}
+
+.sb-sidenav-menu > .nav > .nav-link {
+    margin: 5% auto;
+}
+
+.sidenav {
+    height: 100vh;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 1em;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+.dropdown-menu {
+    background-color: #212529;
+}
+
+.change_info {
+    text-decoration: none;
+    color: #818181;
+}
+
+.change_info:hover {
+    color: #f1f1f1;
+}
+
+.manage_signout {
+    display: block;
+    width: 100%;
+    background-color: transparent;
+    text-decoration: none;
+    color: #818181;
+}
+
+.manage_signout:hover {
+    color: #f1f1f1;
+}
+
+.auto_counsel_list {
+    overflow: hidden;
+    margin-top: 3%;
+}
+
+.auto_counsel_h5 {
+    float: left;
+    width: 85%;
+}
+
+.auto_counsel_btnList {
+    float: left;
+    text-align: right;
+    width: 15%;
+}
+
+.counsel_history_h5 {
+    float: left;
+    width: 70%;
+}
+
+.counsel_history_list {
+    overflow: hidden;
+    margin-top: 3%;
+}
+
+.counsel_history_btnList {
+    float: left;
+    overflow: hidden;
+    width: 30%;
+    padding-top: 1%;
+}
+
+.counsel_history_btnList .btn-toolbar {
+    float: left;
+    margin-right: 5%;
+}
+
+.manual_counsel_list {
+    overflow: hidden;
+    margin-top: 3%;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1em;
+    line-height: 1.5;
+    overflow: hidden;
+}
+
+.pagination li {
+    width: 5%;
+    text-align: center;
+    float: left;
+    list-style: none;
+    border: 1px solid lightgray;
+}
+
+.pagination li a {
+    display: block;
+    width: 100%;
+    float: none;
+    cursor: pointer;
+    text-decoration: none;
+    color: #337ab7;
+    background-color: #fff;
+}
+
+.pagination li a:hover {
+    background-color: #337ab7;
+    color: #fff;
+}
+
+.pagination2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1em;
+    line-height: 1.5;
+    overflow: hidden;
+}
+
+.pagination2 li {
+    width: 5%;
+    text-align: center;
+    float: left;
+    list-style: none;
+    border: 1px solid lightgray;
+}
+
+.pagination2 li a {
+    display: block;
+    width: 100%;
+    float: none;
+    cursor: pointer;
+    text-decoration: none;
+    color: #337ab7;
+    background-color: #fff;
+}
+
+.pagination2 li a:hover {
+    background-color: #337ab7;
+    color: #fff;
+}
+
+.pagination3 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1em;
+    line-height: 1.5;
+    overflow: hidden;
+}
+
+.pagination3 li {
+    width: 5%;
+    text-align: center;
+    float: left;
+    list-style: none;
+    border: 1px solid lightgray;
+}
+
+.pagination3 li a {
+    display: block;
+    width: 100%;
+    float: none;
+    cursor: pointer;
+    text-decoration: none;
+    color: #337ab7;
+    background-color: #fff;
+}
+
+.pagination3 li a:hover {
+    background-color: #337ab7;
+    color: #fff;
+}
+
+.highlight {
+    background-color: skyblue;
+    font-weight: bold;
+}
+
+.update_input {
+    overflow: hidden;
+}
+
+.update_input .input-group {
+    float: left;
+    width: 20%;
+}
+
+.update_input .input-group label {
+    background-color: #fff;
+}
+
+.update_input .coachMsg {
+    width: 100%;
+}
+
+.update_input .coachMsg label{
+    width: 10%;
+    height: 50%;
+}
+
+.update_input .input-group-text {
+    width: 50%;
+    font-size: 1em;
+}
+
+.counsel_history_btnList {
+    overflow: hidden;
+    width: 100%;
+}
+
+.counsel_history_btnList select {
+    width: 10%;
+    float: left;
+    margin-right: 1%;
+}

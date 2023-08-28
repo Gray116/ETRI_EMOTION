@@ -1,0 +1,134 @@
+@font-face {
+    font-family: 'NanumSquareRound';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumSquareRound.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.box img { 
+    display : block;
+    margin : auto;
+    width: 5em;
+    height: 5em;
+}
+
+.logo {
+    padding: 0;
+}
+
+.logo img {
+    display: block;
+    margin: 0 auto;
+}
+
+p {
+    display: inline;
+    margin-top: 1%;
+}
+
+.top {
+    margin: 0 auto;
+    padding: 1%;
+}
+
+.box {
+    text-align: center;
+    border: 1px solid rgb(186, 180, 180);
+}
+
+p {
+    display: block;
+    width: 100%;
+    font-weight: bold;
+}
+
+body {
+    font-family: 'NanumSquareRound';
+}
+
+.sb-sidenav-menu > .nav > .nav-link {
+    margin: 5% auto;
+}
+
+.sidenav {
+    height: 100vh;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 1em;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+@media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+}
+
+.time {
+    margin-left: 20px;
+}
+
+.nav_{
+    position: absolute;
+    top: 1.5%;
+    left: 1%;
+    font-size:30px;
+    cursor:pointer;
+}
+
+.gx-9{
+    margin-top: 1%;
+    width: 100%;
+    padding-left: 3%;
+    border: #111 1px;
+}
+
+.dropdown-menu {
+    background-color: #212529;
+}
+
+.change_info {
+    text-decoration: none;
+    color: #818181;
+}
+
+.change_info:hover {
+    color: #f1f1f1;
+}
+
+.manage_signout {
+    display: block;
+    width: 100%;
+    background-color: transparent;
+    text-decoration: none;
+    color: #818181;
+}
+
+.manage_signout:hover {
+    color: #f1f1f1;
+}

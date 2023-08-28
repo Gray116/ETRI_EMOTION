@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en-ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/bootstrap-5.1.3-dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/stylesheets/styles.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css"   rel="stylesheet" />
+    <link href="/stylesheets/counseling_manage.css"             rel="stylesheet" type="text/css" />
+    <link href="#"                                              rel="shortcut icon" />
+    <title><%= title %></title>
+</head>
+<body>
+    <div class="container-fluid">
+      <form id="counseling_form" name="counseling_form" method="get" action="/manage/counseling_submit">
+        <div class="input-group mt-3">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="inputGroupSelect01">사용 여부</label>
+          </div>
+
+          <select id="counsel_useUnuse" class="form-select" aria-label="Default select example">
+            <option selected>선택</option>
+            <option value="1">사용</option>
+            <option value="2">사용안함</option>
+          </select>
+        </div>
+            
+        <div class="input-group mt-3">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="inputGroupSelect01" style="width: 200px;">기준 시간(초)</label>
+          </div>
+          
+          <select id="counsel_time" class="form-select" aria-label="Default select example">
+            <option selected>선택</option>
+            <option value="1">10</option>
+            <option value="3">30</option>
+            <option value="6">60</option>
+          </select>
+        </div>
+
+        <div class="input-group mt-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-default">초과 횟수(화남)</span>
+          </div>
+          <input id="overAnger" type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"
+            maxlength = "10" oninput= "this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+        </div>
+
+        <div class="input-group mt-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-default">초과 횟수(슬픔)</span>
+          </div>
+          <input id="overSadness" type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"
+            maxlength = "10" oninput= "this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+        </div>
+          
+        <div class="input-group mt-3">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="inputGroupSelect01">코칭 구분</label>
+          </div>
+          
+          <select id="counsel_useUnuse_2" class="form-select" aria-label="Default select example">
+            <option selected>선택</option>
+            <option value="1">자동</option>
+            <option value="2">수동</option>
+          </select>
+        </div>
+        
+        <div class="form-group col-md-6">
+          <label class="input-group-text mt-3" for="inputGroupSelect01" style="width: 200px">자동 코칭 메세지 내용</label>
+          <textarea id="autoCounsel_detail" class="form-control col-sm-5" rows="5" style="resize: none;"></textarea>
+        </div>
+
+        <div class="btn_submit_cancel">
+          <div class="btn_center">
+            <button type="button" class="btn btn-primary" id="counsel_submit">확인</button>
+            <button type="button" class="btn btn-secondary" onclick="javascript:window.close()">취소</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <script src= "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src= "../bootstrap-5.1.3-dist/js/scripts.js"></script>
+    <script src= "//code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+      let useUnuse;           // 사용여부
+      let standardTime;       // 기준시간
+      let overAnger;          // 초과 횟수(화남)
+      let overSadness;        // 초과 횟수(슬픔)
+      let autoCounsel_use;    // 자동 코칭 여부
+      let autoCounsel_detail; // 자동 코칭 메세지
+
+      $(document).ready(function() {
+        let selectOption1 = document.getElementById("counsel_useUnuse");
+        let selectOption2 = document.getElementById("counsel_time");
+        let selectOption3 = document.getElementById("counsel_useUnuse_2");
+
+        // 1. 조건 저장 이벤트
+        $( "#counsel_submit" ).click(function() {
+          // 조건 설정 값 담기
+          useUnuse                  = selectOption1.options[selectOption1.selectedIndex].text;
+          standardTime              = selectOption2.options[selectOption2.selectedIndex].text;
+          overAnger                 = document.getElementById('overAnger').value;
+          overSadness               = document.getElementById('overSadness').value;
+          autoCounsel_use           = selectOption3.options[selectOption3.selectedIndex].text;
+          autoCounsel_detail        = document.getElementById('autoCounsel_detail').value;
+
+          if((useUnuse, standardTime, autoCounsel_use == "선택") && (overAnger, overSadness, autoCounsel_detail == "")) {
+            alert("조건을 선택해주세요");
+            return false;
+          }
+
+          if (useUnuse == "선택") {
+              alert('조건 사용여부를 선택해주세요');
+              return false;
+          }
+
+          if(useUnuse == "사용") {
+            useUnuse = 1;
+          } else if (useUnuse == "사용안함") {
+            useUnuse = 2;
+          } else {
+            alert('조건 사용 여부를 선택 해주세요');
+            return false;
+          }
+
+          if (standardTime == "선택") {
+            alert('기준 시간을 선택해주세요');
+            return false;
+          }
+
+          if (overAnger == "") {
+              alert('기준 초과 횟수(화남)를 입력해주세요');
+              return false;
+          }
+
+          if (overSadness == "") {
+              alert('기준 초과 횟수(슬픔)를 입력해주세요');
+              return false;
+          }
+
+          if (autoCounsel_use == "선택") {
+            alert('기준 시간을 선택해주세요');
+            return false;
+          }
+
+          if(autoCounsel_use == "자동") {
+            autoCounsel_use = 1;
+          } else if (autoCounsel_use == "수동") {
+            autoCounsel_use = 2;
+          } else {
+            alert('코칭 구분을 선택 해주세요');
+            return false;
+          }
+
+          if (autoCounsel_detail == "") {
+            alert('자동 코칭 메세지 내용을 입력해주세요');
+            return false;
+          }
+
+          $.ajax({
+            url: '/manage/counseling_submit?useUnuse='+useUnuse+'&standardTime='+standardTime+
+                    '&overAnger='+overAnger+'&overSadness='+overSadness+'&autoCounsel_use='+autoCounsel_use+'&autoCounsel_detail='+autoCounsel_detail,
+            dataType: 'json',
+            method: 'GET',
+            success: function(result) {
+              if(result) {
+                console.log(result);
+                alert('정상적으로 등록되었습니다.');
+
+                opener.parent.location.reload();
+                window.close();
+              }
+            }
+          });
+        });
+      });
+    </script>
+</body>
+</html>

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet"      href="/bootstrap-5.1.3-dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet"      href="/stylesheets/statistics.css"  type="text/css"/>
+    <link rel="stylesheet"      href="/stylesheets/styles.css"      type="text/css"/>
+    <link rel="stylesheet"      href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css"/>
+    <link rel="shortcut icon"   href="#"/>
+</head>
+<body>
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark shadow">
+        <!-- Navbar Brand-->
+        <a class= "navbar-brand logo" href= "/manage"><img src= "/images/neighbor_white.png" alt= "네이버시스템" width="220px;"/></a>
+        
+        <!-- Sidebar Toggle-->
+        <button class= "btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id= "sidebarToggle" href= "#!"><i class= "fas fa-bars"></i></button>
+        
+        <!-- Navbar Search-->
+        <form class= "d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+            <div class= "input-group">
+                <!-- <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+                <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button> -->
+            </div>
+        </form>
+        
+        <!-- Navbar-->
+        <ul class= "navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class= "nav-item dropdown">
+                <a class= "nav-link dropdown-toggle" id= "navbarDropdown" href= "#" role= "button" data-bs-toggle= "dropdown" aria-expanded= "false"><i class= "fas fa-user fa-fw"></i></a>
+                <ul class= "dropdown-menu dropdown-menu-end" aria-labelledby= "navbarDropdown" style="background-color: #212529;">
+                    <li style= "text-align: center; padding-bottom: 0.5em;">
+                        <a href= "#" class= "change_info">개인정보 수정</a>
+                    </li>
+                    <li>
+                        <form action= "/process/logout" method= "get">
+                            <button class= "manage_signout" type= "submit" style= "border: none; outline:0;">로그아웃</button>
+                        </form>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <div id="layoutSidenav">
+        <div id= "layoutSidenav_nav">
+            <nav class= "sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class= "sb-sidenav-menu">
+                    <div class= "nav">
+                        <a class="nav-link" href="/manage">전체 감성현황</a>
+                        <a class="nav-link" href="/manage/statistics">감성상태 통계분석</a>
+                        <a class="nav-link" href="/manage/230811_dashboard">감성현황 대시보드</a>
+                        <a class="nav-link" href="/manage/monitoring">상담사 통화이력</a>
+                        <a class="nav-link" href="/manage/counseling">상담사 코칭</a>
+                    </div>
+                </div>
+                
+                <div class= "sb-sidenav-footer">
+                    <div class="small" style="text-align: center;">Logged in as: Admin</div>
+                </div>
+            </nav>
+        </div>
+
+        <div id="layoutSidenav_content">
+            <main class="col-md-9 ms-sm-auto col-lg-12 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h2 style="font-weight: bold;">감성상태 통계분석</h2>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <form action= '/manage/statistics' method= "post">
+                            <input type="date" name="theday" class="btn btn-sm btn-outline-secondary dropdown-toggle"></input>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="statistics">
+                    <div class="row">
+                        <div class="col-8 left">
+                            <div class="row gx-3 count_agent">
+                                <div class="col-4 count">
+                                    <div class="box day_count">
+                                        <p style="font-size: 1em;"><%= day_count.length %>명</p>
+                                        <p>일일 평균 상담사</p>
+                                    </div>
+                                    
+                                    <div class="box week_count" style="margin-top: 1%;">
+                                        <p style="font-size: 1em;"><%= week_count.length %>명</p>
+                                        <p>주간 총 상담사</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-8 left_top">
+                                    <p>한 주간 하루 5회 이상 해당 감성을 느낀 총 상담원 수</p>
+                                    <div class="row">
+                                        <div class="col-3 png">
+                                            <div class="box">
+                                                <img src="/images/angry.png" alt="peaceful" width="70px" height="70px" style="margin-top: 10%;">
+                                                <p style="font-size: 1.5em;"><%= angry_count[0].agent_id_cnt %>명</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-3 png">
+                                            <div class="box">
+                                                <img src="/images/sad.png" alt="angry" width="70px" height="70px" style="margin-top:10%;">
+                                                <p style="font-size: 1.5em;"><%= panic_count[0].agent_id_cnt %>명</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-6 png">
+                                            <div class="box">
+                                                <p style="margin-top: 5%;">
+                                                    <img src="/images/angry.png" alt="peaceful" width="70px" height="70px">
+                                                    <img src="/images/plus.png" alt="and" width="40px" height="40px">
+                                                    <img src="/images/sad.png" alt="sad" width="70px" height="70px">
+                                                </p>
+                                                <p style="font-size: 1.5em;"><%= ap_count[0].agent_id_cnt %>명</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="box">
+                                    <canvas id="day_5countg" height="80em;" style="margin-top: 3%;"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="col foot_area">
+                                <div class="row gx-2">
+                                    <div class="col-5 weekg">
+                                        <div class="box">
+                                            <p>주간 감성 분포</p>
+                                            <canvas id="week" width="400wh" height="250vh"></canvas>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-7 call">
+                                        <div class="row g-2 cti">
+                                            <div class="col-6">
+                                                <div class="box gi" style="padding: 5%;">
+                                                    <p>일반문의</p>
+                                                    <div>
+                                                        <h6>평균 통화 시간</h6>
+                                                        <% var cnt = 0;
+                                                        for(var i = 0; i < call_avg.length; i++) { 
+                                                            var data = call_avg[i];
+                                                            if(data.group_type == '1') {%>
+                                                                <p><%= cnt=data.call_avg %>초</p>
+                                                            <%}%>
+                                                        <%}
+                                                        
+                                                        if(cnt == 0) {%>
+                                                            <p>0초</p>
+                                                        <%}%>
+                                                    </div>
+                                                    
+                                                    <div>
+                                                        <h6>1주간 통화 건수</h6>
+                                                        <% var cnt = 0;
+                                                        for(var i = 0; i < call_cnt.length; i++) {
+                                                            var data = call_cnt[i];
+                                                            if(data.group_type == '1') {%>
+                                                                <p><%= cnt=data.call_cnt %>건</p>
+                                                            <%}%>
+                                                        <%}
+                                                        
+                                                        if(cnt == 0) {%>
+                                                            <p>0건</p>
+                                                        <%}%>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <div class="box cr" style="padding: 5%;">
+                                                    <p>민원접수</p>
+                                                    <div>
+                                                        <h6>평균 통화 시간</h6>
+                                                        <% var cnt = 0;
+                                                        for(var i = 0; i < call_avg.length; i++) {
+                                                            var data = call_avg[i];
+                                                            if(data.group_type == '2') {%>
+                                                                <p><%= cnt=data.call_avg %>초</p>
+                                                            <%}%>
+                                                        <%}
+                                                        
+                                                        if(cnt == 0) {%>
+                                                            <p>0초</p>
+                                                        <%}%>
+                                                    </div>
+                                                    
+                                                    <div>
+                                                        <h6>1주간 통화 건수</h6>
+                                                        <% var cnt = 0;
+                                                        for(var i = 0; i < call_cnt.length; i++) {
+                                                            var data = call_cnt[i];
+                                                            if(data.group_type == '2') {%>
+                                                                <p><%= cnt=data.call_cnt %>건</p>
+                                                            <%}%>
+                                                        <%}
+
+                                                        if(cnt == 0) {%>
+                                                            <p>0건</p>
+                                                        <%}%>
+                                                    </div>                                     
+                                                </div>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <div class="box ps" style="padding: 5%;">
+                                                    <p>제품판매</p>
+                                                    <div>
+                                                        <h6>평균 통화 시간</h6>
+                                                        <% var cnt = 0;
+                                                        for(var i = 0; i < call_avg.length; i++) {
+                                                            var data = call_avg[i];
+                                                            if(data.group_type == '3') {%>
+                                                                <p><%= cnt=data.call_avg %>초</p>
+                                                            <%}%>
+                                                        <%}
+                                                        
+                                                        if(cnt == 0) {%>
+                                                            <p>0초</p>
+                                                        <%}%>
+                                                    </div>
+
+                                                    <div>
+                                                        <h6>1주간 통화 건수</h6>
+                                                        <% var cnt = 0;
+                                                        for(var i = 0; i < call_cnt.length; i++) {
+                                                            var data = call_cnt[i];
+                                                            if(data.group_type == '3') {%>
+                                                                <p><%= cnt=data.call_cnt %>건</p>
+                                                            <%}%>
+                                                        <%}
+                                                        
+                                                        if(cnt == 0) {%>
+                                                            <p>0건</p>
+                                                        <%}%>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <div class="box or" style="padding: 5%;">
+                                                    <p>기타접수</p>
+                                                    <div>
+                                                        <h6>평균 통화 시간</h6>
+                                                        <% var cnt = 0;
+                                                        for(var i = 0; i < call_avg.length; i++) {
+                                                            var data = call_avg[i];
+                                                            if(data.group_type == '4') {%>
+                                                                <p><%= cnt=data.call_avg %>초</p>
+                                                            <%}%>
+                                                        <%}
+                                                        
+                                                        if(cnt == 0) {%>
+                                                            <p>0초</p>
+                                                        <%}%>
+                                                    </div>
+                                                    
+                                                    <div>
+                                                        <h6>1주간 통화 건수</h6>
+                                                        <% var cnt = 0;
+                                                        for(var i = 0; i < call_cnt.length; i++) {
+                                                            var data = call_cnt[i];
+                                                            if(data.group_type == '4') {%>
+                                                                <p><%= cnt=data.call_cnt %>건</p>
+                                                            <%}%>
+                                                        <%}
+                                                        
+                                                        if(cnt == 0) {%>
+                                                            <p>0건</p>
+                                                        <%}%>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-4 right">
+                            <div class="box group_canvas">
+                                <p>한 주간 그룹별 하루 5회 이상<br>해당 감성을 느낀 총 상담사 수</p>
+                                <canvas id="week_group" height="430px"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- chart.js -->
+    <script src= "https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src= "//code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src= "https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+    <script src= "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src= "../bootstrap-5.1.3-dist/js/scripts.js"></script>
+    <script src= "/websocket/websocket_admin.js" type="text/javascript"></script>
+    <script>
+        // 1주간 하루 5회 이상 해당 감성을 느낀 상담원 수 그래프
+        var context = document.getElementById('day_5countg').getContext('2d');
+        
+        // app.js에서 JSON형태로 읽어옴
+        var day_5countAngry = JSON.parse('<%-JSON.stringify(day_5countAngry) %>')
+        var day_5countSad   = JSON.parse('<%-JSON.stringify(day_5countSad) %>')
+        var day_5countBoth  = JSON.parse('<%-JSON.stringify(day_5countBoth) %>')
+    
+        var day_5countg = new Chart(context, {
+            type: 'line', // 차트의 형태
+            data: { // 차트에 들어갈 데이터
+                labels: [
+                    day_5countAngry[0]['response_dt'], day_5countAngry[1]['response_dt'], day_5countAngry[2]['response_dt'],
+                    day_5countAngry[3]['response_dt'], day_5countAngry[4]['response_dt'], day_5countAngry[5]['response_dt'], day_5countAngry[6]['response_dt']
+                ],
+                datasets: [
+                    {
+                        label: '화남',
+                        fill: false,
+                        data: [
+                            day_5countAngry[0]['count'], day_5countAngry[1]['count'], day_5countAngry[2]['count'], day_5countAngry[3]['count'],
+                            day_5countAngry[4]['count'], day_5countAngry[5]['count'], day_5countAngry[6]['count']
+                        ],
+                        borderColor: 'rgb(255, 41,29)',
+                        backgroundColor: 'rgb(255, 41,29)',
+                        borderWidth: 3,
+                        tension: 0, // 직선차트
+                    },
+                    {
+                        label: '슬픔',
+                        fill: false,
+                        data: [
+                            day_5countSad[0]['count'], day_5countSad[1]['count'], day_5countSad[2]['count'], day_5countSad[3]['count'],
+                            day_5countSad[4]['count'], day_5countSad[5]['count'], day_5countSad[6]['count']
+                        ],
+                        borderColor: 'rgb(3, 141, 213)',
+                        backgroundColor: 'rgb(3, 141, 213)',
+                        borderWidth: 3,
+                        tension: 0, //직선차트
+                    },
+                    { //데이터
+                        label: '화남&슬픔', //차트 제목
+                        fill: false, // line 형태일 때, 선 안쪽을 채우는지 안채우는지
+                        data: [
+                            day_5countBoth[0]['count'], day_5countBoth[1]['count'], day_5countBoth[2]['count'], day_5countBoth[3]['count'],
+                            day_5countBoth[4]['count'], day_5countBoth[5]['count'], day_5countBoth[6]['count']
+                        ],
+                        borderColor: 'rgb(128, 0, 128)',
+                        backgroundColor: 'rgb(128, 0, 128)',
+                        borderWidth: 3,
+                        tension: 0, //직선차트
+                    }
+                ]
+            },
+            options: {
+                legend:{
+                    display: true,
+                    position:'bottom'
+                },
+                scales: {
+                    yAxes: [
+                        {
+                            stacked: false,
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }
+                    ]
+                }
+            }
+        });
+    
+        //주간 감성 분포 그래프
+        var ap_count    = JSON.parse('<%- JSON.stringify(ap_count) %>');
+        var hp_count    = JSON.parse('<%- JSON.stringify(hp_count) %>');
+        var angry_count = JSON.parse('<%- JSON.stringify(angry_count) %>');
+        var panic_count = JSON.parse('<%- JSON.stringify(panic_count) %>');
+        
+        var context     = document.getElementById('week').getContext('2d');
+        var week        = new Chart(context, {
+            type: 'doughnut', // 차트의 형태
+            data: { // 차트에 들어갈 데이터
+                labels: ['화남', '슬픔', '화남&슬픔', '기타'], //x 축
+                datasets: [
+                    { // 데이터
+                        label: 'test1', // 차트 제목
+                        data: [
+                            angry_count[0].agent_id_cnt, 
+                            panic_count[0].agent_id_cnt, 
+                            ap_count[0].agent_id_cnt, 
+                            hp_count[0].agent_id_cnt
+                        ], // x축 label에 대응되는 데이터 값
+                        backgroundColor: ['rgb(255, 41,29)', 'rgb(3, 141, 213)', 'rgb(128, 0, 128)', 'rgb(192, 192, 192)'],
+                    },
+                ]
+            },
+            options: {
+                responsive:false,
+                plugins: {
+                    labels:{
+                        padding:100
+                    },
+                    datalabels: {
+                        formatter: (value) => {
+                            return value + '%';
+                        }
+                    }
+                }
+            }
+        }
+        );
+    
+        //1주간 그룹별 5회 이상 해당 감성을 느낀 총 상담원 수 그래프
+        drawColumnChart(); //누적 바 그래프
+        function drawColumnChart() {
+            var barOptions_stacked = {
+                tooltips: {
+                    enabled: true
+                },
+                hover: {
+                    animationDuration: 0,
+                    mode:'x'
+                },
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            fontFamily: "'Open Sans Bold', sans-serif",
+                            fontSize: 11
+                        },
+                        scaleLabel: {
+                            display: false
+                        },
+                        gridLines: {
+                        },
+                        stacked: true
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            display: false,
+                            color: "#fff",
+                            zeroLineColor: "#fff",
+                            zeroLineWidth: 0
+                        },
+                        ticks: {
+                            fontFamily: "'Open Sans Bold', sans-serif",
+                            fontSize: 11
+                        },
+                        stacked: true,
+                        barThickness: 70
+                    }]
+                },
+                legend: {
+                    display: true,
+                    position:'bottom'
+                },
+                animation: {
+                    onComplete: function () {
+                        var chartInstance   = this.chart;
+                        var ctx             = chartInstance.ctx;
+                        ctx.textAlign       = "left";
+                        ctx.font            = "9px Open Sans";
+                        ctx.fillStyle       = "#fff";
+    
+                        Chart.helpers.each(this.data.datasets.forEach(function (dataset, i) {
+                            var meta = chartInstance.controller.getDatasetMeta(i);
+                            Chart.helpers.each(meta.data.forEach(function (bar, index) {
+                                data = dataset.data[index];
+                                if (data == 0) {
+                                    ctx.fillText(data, 50, bar._model.y + 4);
+                                } else {
+                                    ctx.fillText(data, bar._model.x - 25, bar._model.y + 4);
+                                }
+                            }), this)
+                        }), this);
+                    }
+                },
+                pointLabelFontFamily: "Quadon Extra Bold",
+                scaleFontFamily: "Quadon Extra Bold",
+            };
+
+            var context         = document.getElementById('week_group').getContext('2d');
+            
+            var angryg_count    = JSON.parse('<%- JSON.stringify(angryg_count) %>');
+            var panicg_count    = JSON.parse('<%- JSON.stringify(panicg_count) %>');
+            var apg_count       = JSON.parse('<%- JSON.stringify(apg_count) %>');
+            
+            var angryg_count1=0, angryg_count2=0, angryg_count3=0, angryg_count4=0;
+            var panicg_count1=0, panicg_count2=0, panicg_count3=0, panicg_count4=0;
+            var apg_count1=0, apg_count2=0, apg_count3=0, apg_count4=0;
+
+            for(var i= 0; i< angryg_count.length; i++) { // 화남
+                var data = angryg_count[i];
+                if(data.group_type == '1') {
+                    angryg_count1 = data.emotion_cnt_2;
+                }
+
+                if(data.group_type == '2') {
+                    angryg_count2 = data.emotion_cnt_2;
+                }
+
+                if(data.group_type == '3') {
+                    angryg_count3 = data.emotion_cnt_2;
+                }
+
+                if(data.group_type == '4') {
+                    angryg_count4 = data.emotion_cnt_2;
+                }
+            }
+
+            for(var i= 0; i< panicg_count.length; i++) { // 슬픔
+                var data = panicg_count[i];
+                if(data.group_type == '1') {
+                    panicg_count1 = data.emotion_cnt_2;
+                }
+
+                if(data.group_type == '2') {
+                    panicg_count2 = data.emotion_cnt_2;
+                }
+
+                if(data.group_type == '3') {
+                    panicg_count3 = data.emotion_cnt_2;
+                }
+
+                if(data.group_type == '4') {
+                    panicg_count4 = data.emotion_cnt_2;
+                }
+            }
+
+            for(var i= 0; i< apg_count.length; i++) { // 동시
+                var data = apg_count[i];
+                if(data.group_type == '1') {
+                    apg_count1=data.angry_sad_cnt;
+                }
+
+                if(data.group_type == '2') {
+                    apg_count2=data.angry_sad_cnt;
+                }
+
+                if(data.group_type == '3') {
+                    apg_count3=data.angry_sad_cnt;
+                }
+
+                if(data.group_type == '4') {
+                    apg_count4=data.angry_sad_cnt;
+                }
+            }
+    
+            var week_group = new Chart(context, {
+                type: 'horizontalBar',
+                data: {
+                    labels: ["일반문의", "민원접수", "제품판매", "기타접수"],
+                    datasets: [{
+                        label:'화남',
+                        data: [angryg_count1, angryg_count2, angryg_count3, angryg_count4],
+                        borderColor: 'rgb(255, 41,29)',
+                        backgroundColor: 'rgb(255, 41,29)',
+                        hoverBackgroundColor: 'rgb(255, 41,29)'
+                    }, {
+                        label:'슬픔',
+                        data: [panicg_count1, panicg_count2, panicg_count3, panicg_count4],
+                        borderColor: "rgb(3, 141, 213)",
+                        backgroundColor: "rgb(3, 141, 213)",
+                        hoverBackgroundColor: "rgb(3, 141, 213)"
+                    }, {
+                        label:'화남&슬픔',
+                        data: [apg_count1, apg_count2, apg_count3, apg_count4],
+                        borderColor: 'rgb(128, 0, 128)',
+                        backgroundColor: 'rgb(128, 0, 128)',
+                        hoverBackgroundColor: "rgb(128, 0, 128)"
+                    }]
+                },
+                options: barOptions_stacked
+            });
+        }
+    </script>
+</body>
+</html>
